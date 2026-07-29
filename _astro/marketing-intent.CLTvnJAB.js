@@ -1,0 +1,1 @@
+var e=`prompt`,t=`remix`;function n(n,r){let i=new URL(n);return i.searchParams.delete(e),i.searchParams.delete(t),r.kind===`prompt`?i.searchParams.set(e,r.prompt.trim().slice(0,280)):i.searchParams.set(t,r.templateId),i.href}export{n,e as t};
