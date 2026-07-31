@@ -21,7 +21,12 @@ async function walk(directory) {
 }
 
 const allFiles = await walk(root);
-const sourceFiles = allFiles.filter((file) => sourceExtensions.has(path.extname(file).toLowerCase()));
+const sourceFiles = allFiles.filter((file) => {
+  const relative = path.relative(root, file);
+  const [topLevel] = relative.split(path.sep);
+  return !["scripts", "tests"].includes(topLevel)
+    && sourceExtensions.has(path.extname(file).toLowerCase());
+});
 const sources = await Promise.all(sourceFiles.map(async (file) => ({
   file,
   text: await readFile(file, "utf8"),
