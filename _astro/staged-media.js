@@ -1,9 +1,16 @@
-const manifestPromise = fetch("/home-v2/media-manifest.json", { credentials: "same-origin" })
-  .then((response) => {
-    if (!response.ok) throw new Error(`Media manifest failed: ${response.status}`);
-    return response.json();
-  });
-void manifestPromise.catch(() => {});
+let manifestPromise;
+
+function getManifest() {
+  if (!manifestPromise) {
+    manifestPromise = fetch("/home-v2/media-manifest.json", { credentials: "same-origin" })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Media manifest failed: ${response.status}`);
+        return response.json();
+      });
+    void manifestPromise.catch(() => {});
+  }
+  return manifestPromise;
+}
 
 const desktopQuery = matchMedia("(min-width: 900px)");
 const reducedMotionQuery = matchMedia("(prefers-reduced-motion: reduce)");
@@ -111,7 +118,7 @@ async function initializeStudio(container) {
   container.dataset.initialized = "true";
   revealPoster(container);
   if (reducedMotionQuery.matches) return;
-  const manifest = await manifestPromise;
+  const manifest = await getManifest();
   const config = manifest.studio[viewport()];
   const preview = container.querySelector("[data-studio-preview]");
   const full = container.querySelector("[data-studio-full]");
@@ -177,7 +184,7 @@ function createSequence(stage, frameCount) {
   async function preload() {
     revealPoster(stage);
     if (reducedMotionQuery.matches || constrainedNetwork) return;
-    const manifest = await manifestPromise;
+    const manifest = await getManifest();
     const config = manifest.sequences.find((item) => item.id === stage.dataset.mediaId);
     if (!config) throw new Error(`Missing sequence ${stage.dataset.mediaId}`);
     await loadRendition(video, config[viewport()]);

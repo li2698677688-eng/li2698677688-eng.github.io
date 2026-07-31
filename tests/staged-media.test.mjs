@@ -14,6 +14,7 @@ async function readManifest() {
 
 test("the first response does not directly request homepage video or WebP sequences", async () => {
   const html = await read("index.html");
+  const stagedMedia = await read("_astro/staged-media.js");
 
   assert.doesNotMatch(html, /<source\s+src="\/home-v2\/studio-zuizhong\.mp4"/);
   assert.doesNotMatch(html, /\/home-v2\/how-sequences\//);
@@ -22,6 +23,8 @@ test("the first response does not directly request homepage video or WebP sequen
   assert.match(html, /data-staged-studio/);
   assert.match(html, /_astro\/staged-media\.js/);
   assert.match(html, /_astro\/lazy-sections\.js/);
+  assert.doesNotMatch(stagedMedia, /^const manifestPromise = fetch/m);
+  assert.match(stagedMedia, /function getManifest\(\)/);
 });
 
 test("the media manifest describes responsive preview, full, and sequence renditions", async () => {
