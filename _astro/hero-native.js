@@ -111,3 +111,11 @@ window.addEventListener("pagehide", () => {
 const startTitleAnimation = () => { void animateTitle(); };
 if ("requestIdleCallback" in window) requestIdleCallback(startTitleAnimation, { timeout: 3000 });
 else window.setTimeout(startTitleAnimation, 1000);
+
+function revealBottomGradient() {
+  window.setTimeout(() => {
+    document.querySelector(".v3-bottom-gradient")?.classList.add("is-layout-stable");
+  }, 2500);
+}
+if (document.readyState === "complete") revealBottomGradient();
+else window.addEventListener("load", revealBottomGradient, { once: true });

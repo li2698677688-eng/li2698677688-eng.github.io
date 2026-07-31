@@ -7,6 +7,25 @@
   width: 100%;
 }
 
+.v3-hero-title__line,
+.v3-hero-title__measure,
+.v3-hero-title__typed {
+  justify-self: stretch;
+  text-align: center;
+  width: 100%;
+}
+
+.v3-bottom-gradient {
+  opacity: 0;
+  transition: opacity 400ms ease;
+  visibility: hidden;
+}
+
+.v3-bottom-gradient.is-layout-stable {
+  opacity: 1;
+  visibility: visible;
+}
+
 .staged-media-picture {
   opacity: 1;
   transition: opacity 180ms ease;

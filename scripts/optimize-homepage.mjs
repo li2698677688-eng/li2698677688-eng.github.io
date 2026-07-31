@@ -63,7 +63,7 @@ if (!html.includes("/_astro/staged-media.js")) {
   html = replaceOnce(
     html,
     /<div class="v3-studio-shot__viewport" data-media-slot="studio-showcase" data-media-kind="animation"><video[^>]+><source src="\/home-v2\/studio-zuizhong\.mp4" type="video\/mp4"><\/video><\/div>/,
-    '<div class="v3-studio-shot__viewport" data-media-slot="studio-showcase" data-media-kind="animation" data-staged-studio><picture class="staged-media-picture"><source media="(max-width: 899px)" srcset="/home-v2/staged/studio-poster-540.jpg"><img src="/home-v2/staged/studio-poster-720.jpg" alt="Wanaka Studio building a playable 3D island" loading="lazy" decoding="async"></picture><video class="staged-studio-video is-preview" aria-label="Wanaka Studio preview" muted playsinline loop preload="none" data-studio-preview></video><video class="staged-studio-video is-full" aria-label="Wanaka Studio building a playable 3D island" muted playsinline loop preload="none" data-studio-full></video></div>',
+    '<div class="v3-studio-shot__viewport" data-media-slot="studio-showcase" data-media-kind="animation" data-staged-studio><picture class="staged-media-picture"><source media="(max-width: 899px)" data-srcset="/home-v2/staged/studio-poster-540.jpg"><img data-src="/home-v2/staged/studio-poster-720.jpg" alt="Wanaka Studio building a playable 3D island" decoding="async"></picture><video class="staged-studio-video is-preview" aria-label="Wanaka Studio preview" muted playsinline loop preload="none" data-studio-preview></video><video class="staged-studio-video is-full" aria-label="Wanaka Studio building a playable 3D island" muted playsinline loop preload="none" data-studio-full></video></div>',
     "studio staged video",
   );
 
@@ -74,17 +74,30 @@ if (!html.includes("/_astro/staged-media.js")) {
     const match = html.match(sequencePattern);
     if (!match) throw new Error(`sequence ${step}: expected exactly one match`);
     const [, classes, extraAttributes, alt] = match;
-    const replacement = `<div class="${classes}"${extraAttributes}data-media-id="how-${step}" data-how-sequence-frame-count="16"><img class="v3-process-sequence__fallback" src="/home-v2/staged/how-${step}-poster.jpg" alt="${alt}" loading="lazy" decoding="async" data-how-sequence-fallback><video class="v3-process-sequence__canvas staged-sequence-video" muted playsinline preload="none" aria-hidden="true" data-staged-sequence></video></div>`;
+    const replacement = `<div class="${classes}"${extraAttributes}data-media-id="how-${step}" data-how-sequence-frame-count="16"><img class="v3-process-sequence__fallback" data-src="/home-v2/staged/how-${step}-poster.jpg" alt="${alt}" decoding="async" data-how-sequence-fallback><video class="v3-process-sequence__canvas staged-sequence-video" muted playsinline preload="none" aria-hidden="true" data-staged-sequence></video></div>`;
     html = html.replace(sequencePattern, replacement);
   }
 
   html = replaceOnce(
     html,
     '<script type="module" src="/_astro/HowItWorks.astro_astro_type_script_index_0_lang.B4Q08uM8.js"></script>',
-    '<script type="module" src="/_astro/staged-media.js"></script><script type="module" src="/_astro/HowItWorks.astro_astro_type_script_index_0_lang.B4Q08uM8.js"></script>',
+    '<script type="module" src="/_astro/staged-media.js"></script><script type="module" src="/_astro/lazy-sections.js"></script>',
     "staged media runtime",
   );
 }
+
+html = html.replaceAll(' src="/home-v2/staged/studio-poster-720.jpg"', ' data-src="/home-v2/staged/studio-poster-720.jpg"');
+html = html.replaceAll(' srcset="/home-v2/staged/studio-poster-540.jpg"', ' data-srcset="/home-v2/staged/studio-poster-540.jpg"');
+html = html.replace(/ src="(\/home-v2\/staged\/how-[1-4]-poster\.jpg)"/g, ' data-src="$1"');
+if (!html.includes('/_astro/lazy-sections.js')) {
+  html = replaceOnce(
+    html,
+    '<script type="module" src="/_astro/staged-media.js"></script><script type="module" src="/_astro/HowItWorks.astro_astro_type_script_index_0_lang.B4Q08uM8.js"></script>',
+    '<script type="module" src="/_astro/staged-media.js"></script><script type="module" src="/_astro/lazy-sections.js"></script>',
+    "lazy section runtime",
+  );
+}
+html = html.replace('<script type="module" src="/_astro/Faq.astro_astro_type_script_index_0_lang.7dHmyes1.js"></script>', "");
 
 await writeFile(htmlPath, html);
 

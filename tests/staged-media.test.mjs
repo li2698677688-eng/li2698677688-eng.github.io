@@ -17,8 +17,11 @@ test("the first response does not directly request homepage video or WebP sequen
 
   assert.doesNotMatch(html, /<source\s+src="\/home-v2\/studio-zuizhong\.mp4"/);
   assert.doesNotMatch(html, /\/home-v2\/how-sequences\//);
+  assert.doesNotMatch(html, /\ssrc="\/home-v2\/staged\/[^\"]+-poster\.jpg"/);
+  assert.doesNotMatch(html, /<script[^>]+src="\/_astro\/(?:HowItWorks|Faq)[^"]+\.js"/);
   assert.match(html, /data-staged-studio/);
   assert.match(html, /_astro\/staged-media\.js/);
+  assert.match(html, /_astro\/lazy-sections\.js/);
 });
 
 test("the media manifest describes responsive preview, full, and sequence renditions", async () => {
