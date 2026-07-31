@@ -1,0 +1,9 @@
+{
+  "name": "wanaka-homepage-preview",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "media:audit": "node scripts/media-audit.mjs"
+  }
+}

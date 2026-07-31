@@ -1,0 +1,55 @@
+.staged-media-picture,
+.staged-studio-video,
+.staged-sequence-video {
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.staged-media-picture {
+  opacity: 1;
+  transition: opacity 180ms ease;
+  z-index: 2;
+}
+
+.staged-media-picture img {
+  display: block;
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+.staged-media-picture.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.staged-studio-video,
+.staged-sequence-video {
+  background: transparent;
+  object-fit: contain;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.staged-studio-video.is-playing,
+.staged-sequence-video.is-ready {
+  opacity: 1;
+}
+
+.staged-studio-video.is-full {
+  z-index: 1;
+}
+
+.staged-studio-video.is-preview {
+  z-index: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .staged-studio-video,
+  .staged-sequence-video {
+    display: none;
+  }
+}

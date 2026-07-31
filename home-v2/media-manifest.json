@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "studio": {
+    "desktop": {
+      "poster": "/home-v2/staged/studio-poster-720.jpg",
+      "preview": {
+        "webm": "/home-v2/staged/studio-preview-720.webm",
+        "mp4": "/home-v2/staged/studio-preview-720.mp4"
+      },
+      "full": {
+        "webm": "/home-v2/staged/studio-full-720.webm",
+        "mp4": "/home-v2/staged/studio-full-720.mp4"
+      }
+    },
+    "mobile": {
+      "poster": "/home-v2/staged/studio-poster-540.jpg",
+      "preview": {
+        "webm": "/home-v2/staged/studio-preview-540.webm",
+        "mp4": "/home-v2/staged/studio-preview-540.mp4"
+      },
+      "full": {
+        "webm": "/home-v2/staged/studio-full-540.webm",
+        "mp4": "/home-v2/staged/studio-full-540.mp4"
+      }
+    }
+  },
+  "sequences": [
+    {
+      "id": "how-1",
+      "frameCount": 16,
+      "poster": "/home-v2/staged/how-1-poster.jpg",
+      "desktop": {
+        "webm": "/home-v2/staged/how-1-960.webm",
+        "mp4": "/home-v2/staged/how-1-960.mp4"
+      },
+      "mobile": {
+        "webm": "/home-v2/staged/how-1-720.webm",
+        "mp4": "/home-v2/staged/how-1-720.mp4"
+      }
+    },
+    {
+      "id": "how-2",
+      "frameCount": 16,
+      "poster": "/home-v2/staged/how-2-poster.jpg",
+      "desktop": {
+        "webm": "/home-v2/staged/how-2-960.webm",
+        "mp4": "/home-v2/staged/how-2-960.mp4"
+      },
+      "mobile": {
+        "webm": "/home-v2/staged/how-2-720.webm",
+        "mp4": "/home-v2/staged/how-2-720.mp4"
+      }
+    },
+    {
+      "id": "how-3",
+      "frameCount": 16,
+      "poster": "/home-v2/staged/how-3-poster.jpg",
+      "desktop": {
+        "webm": "/home-v2/staged/how-3-960.webm",
+        "mp4": "/home-v2/staged/how-3-960.mp4"
+      },
+      "mobile": {
+        "webm": "/home-v2/staged/how-3-720.webm",
+        "mp4": "/home-v2/staged/how-3-720.mp4"
+      }
+    },
+    {
+      "id": "how-4",
+      "frameCount": 16,
+      "poster": "/home-v2/staged/how-4-poster.jpg",
+      "desktop": {
+        "webm": "/home-v2/staged/how-4-960.webm",
+        "mp4": "/home-v2/staged/how-4-960.mp4"
+      },
+      "mobile": {
+        "webm": "/home-v2/staged/how-4-720.webm",
+        "mp4": "/home-v2/staged/how-4-720.mp4"
+      }
+    }
+  ]
+}
