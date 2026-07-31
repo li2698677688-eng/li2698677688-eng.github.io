@@ -64,7 +64,9 @@ function wait(milliseconds) {
 }
 
 async function animateTitle() {
-  if (!typed || !measure || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (!typed || !measure
+    || matchMedia("(max-width: 899px)").matches
+    || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   let index = 0;
   while (document.documentElement.contains(typed)) {
     await wait(2400);
