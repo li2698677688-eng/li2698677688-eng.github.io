@@ -1,26 +1,26 @@
 {
-  "version": 2,
+  "version": 3,
   "studio": {
     "desktop": {
-      "poster": "/home-v2/staged/studio-poster-720.jpg",
+      "poster": "/home-v2/staged/studio-v3-poster-720.jpg",
       "preview": {
-        "webm": "/home-v2/staged/studio-preview-720.webm",
-        "mp4": "/home-v2/staged/studio-preview-720.mp4"
+        "webm": "/home-v2/staged/studio-v3-preview-720.webm",
+        "mp4": "/home-v2/staged/studio-v3-preview-720.mp4"
       },
       "full": {
-        "webm": "/home-v2/staged/studio-full-720.webm",
-        "mp4": "/home-v2/staged/studio-full-720.mp4"
+        "webm": "/home-v2/staged/studio-v3-full-720.webm",
+        "mp4": "/home-v2/staged/studio-v3-full-720.mp4"
       }
     },
     "mobile": {
-      "poster": "/home-v2/staged/studio-poster-540.jpg",
+      "poster": "/home-v2/staged/studio-v3-poster-540.jpg",
       "preview": {
-        "webm": "/home-v2/staged/studio-preview-540.webm",
-        "mp4": "/home-v2/staged/studio-preview-540.mp4"
+        "webm": "/home-v2/staged/studio-v3-preview-540.webm",
+        "mp4": "/home-v2/staged/studio-v3-preview-540.mp4"
       },
       "full": {
-        "webm": "/home-v2/staged/studio-full-540.webm",
-        "mp4": "/home-v2/staged/studio-full-540.mp4"
+        "webm": "/home-v2/staged/studio-v3-full-540.webm",
+        "mp4": "/home-v2/staged/studio-v3-full-540.mp4"
       }
     }
   },

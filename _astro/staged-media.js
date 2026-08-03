@@ -2,7 +2,7 @@ let manifestPromise;
 
 function getManifest() {
   if (!manifestPromise) {
-    manifestPromise = fetch("/home-v2/media-manifest.json", { credentials: "same-origin" })
+    manifestPromise = fetch("/home-v2/media-manifest.json?v=3", { credentials: "same-origin" })
       .then((response) => {
         if (!response.ok) throw new Error(`Media manifest failed: ${response.status}`);
         return response.json();

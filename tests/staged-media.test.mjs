@@ -21,10 +21,11 @@ test("the first response does not directly request homepage video or WebP sequen
   assert.doesNotMatch(html, /\ssrc="\/home-v2\/staged\/[^\"]+-poster\.jpg"/);
   assert.doesNotMatch(html, /<script[^>]+src="\/_astro\/(?:HowItWorks|Faq)[^"]+\.js"/);
   assert.match(html, /data-staged-studio/);
-  assert.match(html, /_astro\/staged-media\.js/);
+  assert.match(html, /_astro\/staged-media\.js\?v=3/);
   assert.match(html, /_astro\/lazy-sections\.js/);
   assert.doesNotMatch(stagedMedia, /^const manifestPromise = fetch/m);
   assert.match(stagedMedia, /function getManifest\(\)/);
+  assert.match(stagedMedia, /media-manifest\.json\?v=3/);
 });
 
 test("the how stories use the aggressive transparent videos with WebP fallback frames", async () => {
@@ -32,7 +33,7 @@ test("the how stories use the aggressive transparent videos with WebP fallback f
   const stagedMedia = await read("_astro/staged-media.js");
   let totalVideoBytes = 0;
 
-  assert.equal(manifest.version, 2);
+  assert.equal(manifest.version, 3);
   assert.equal(manifest.sequences.length, 4);
   for (const [index, sequence] of manifest.sequences.entries()) {
     const step = index + 1;
@@ -66,11 +67,19 @@ test("the how stories use the aggressive transparent videos with WebP fallback f
 test("the media manifest describes responsive studio media and transparent sequences", async () => {
   const manifest = await readManifest();
 
-  assert.equal(manifest.version, 2);
+  assert.equal(manifest.version, 3);
   for (const viewport of ["desktop", "mobile"]) {
+    const height = viewport === "desktop" ? 720 : 540;
+    assert.equal(manifest.studio[viewport].poster, `/home-v2/staged/studio-v3-poster-${height}.jpg`);
     for (const phase of ["preview", "full"]) {
-      assert.match(manifest.studio[viewport][phase].webm, /\.webm$/);
-      assert.match(manifest.studio[viewport][phase].mp4, /\.mp4$/);
+      assert.equal(
+        manifest.studio[viewport][phase].webm,
+        `/home-v2/staged/studio-v3-${phase}-${height}.webm`,
+      );
+      assert.equal(
+        manifest.studio[viewport][phase].mp4,
+        `/home-v2/staged/studio-v3-${phase}-${height}.mp4`,
+      );
     }
   }
   assert.equal(manifest.sequences.length, 4);
@@ -96,6 +105,15 @@ test("generated media stays inside the agreed transfer budgets", async () => {
     assert.ok((await stat(new URL(`.${studio.preview.mp4}`, root))).size <= limits[viewport].preview);
     assert.ok((await stat(new URL(`.${studio.full.webm}`, root))).size <= limits[viewport].fullWebm);
     assert.ok((await stat(new URL(`.${studio.full.mp4}`, root))).size <= limits[viewport].fullMp4);
+
+    const transferLimits = viewport === "desktop"
+      ? { webm: 2_100_000, mp4: 1_850_000 }
+      : { webm: 1_350_000, mp4: 1_200_000 };
+    for (const format of ["webm", "mp4"]) {
+      const previewBytes = (await stat(new URL(`.${studio.preview[format]}`, root))).size;
+      const fullBytes = (await stat(new URL(`.${studio.full[format]}`, root))).size;
+      assert.ok(previewBytes + fullBytes <= transferLimits[format]);
+    }
   }
 
   for (const sequence of manifest.sequences) {
