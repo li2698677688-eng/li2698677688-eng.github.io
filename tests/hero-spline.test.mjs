@@ -73,3 +73,21 @@ test("the retired Three.js and GLB hero chain is absent", async () => {
   assert.equal(packageJson.devDependencies?.esbuild, undefined);
   assert.equal(packageJson.scripts?.["build:hero-models"], undefined);
 });
+
+test("the retired Spline mirrors and QA artifacts are not deployed", async () => {
+  const packageJson = JSON.parse(await read("package.json"));
+  const retiredPaths = [
+    "../home-v2/spline-scenes/",
+    "../home-v2/spline-posters/",
+    "../artifacts/",
+    "../scripts/build-transparent-spline.mjs",
+    "../scripts/build-spline-poster-assets.py",
+    "../scripts/remove-spline-background.swift",
+    "../design-qa.md",
+  ];
+
+  assert.equal(packageJson.scripts?.["build:spline-scenes"], undefined);
+  for (const path of retiredPaths) {
+    await assert.rejects(stat(new URL(path, import.meta.url)), { code: "ENOENT" });
+  }
+});
