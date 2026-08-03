@@ -25,7 +25,7 @@ if (!html.includes("/_astro/hero-spline.css")) {
   html = replaceOnce(
     html,
     '<link rel="stylesheet" href="/_astro/staged-media.css">',
-    '<link rel="stylesheet" href="/_astro/staged-media.css"><link rel="stylesheet" href="/_astro/hero-spline.css?v=1">',
+    '<link rel="stylesheet" href="/_astro/staged-media.css"><link rel="stylesheet" href="/_astro/hero-spline.css?v=2">',
     "hero Spline stylesheet",
   );
 }
@@ -52,7 +52,7 @@ if (!html.includes("/_astro/hero-spline-loader.js")) {
   html = replaceOnce(
     html,
     '<script type="module" src="/_astro/hero-native.js"></script>',
-    '<script type="module" src="/_astro/hero-native.js"></script><script type="module" src="/_astro/hero-spline-loader.js?v=1"></script>',
+    '<script type="module" src="/_astro/hero-native.js"></script><script type="module" src="/_astro/hero-spline-loader.js?v=2"></script>',
     "hero Spline loader",
   );
 }
@@ -131,6 +131,8 @@ if (!html.includes("/_astro/staged-media.js")) {
 }
 
 html = html.replaceAll(' src="/home-v2/staged/studio-poster-720.jpg"', ' data-src="/home-v2/staged/studio-poster-720.jpg"');
+html = html.replaceAll('/_astro/hero-spline.css?v=1', '/_astro/hero-spline.css?v=2');
+html = html.replaceAll('/_astro/hero-spline-loader.js?v=1', '/_astro/hero-spline-loader.js?v=2');
 html = html.replaceAll(' srcset="/home-v2/staged/studio-poster-540.jpg"', ' data-srcset="/home-v2/staged/studio-poster-540.jpg"');
 html = html.replaceAll('/home-v2/staged/studio-poster-720.jpg', '/home-v2/staged/studio-v3-poster-720.jpg');
 html = html.replaceAll('/home-v2/staged/studio-poster-540.jpg', '/home-v2/staged/studio-v3-poster-540.jpg');
