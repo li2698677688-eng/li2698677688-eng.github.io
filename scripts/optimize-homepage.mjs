@@ -13,33 +13,12 @@ function replaceOnce(source, pattern, replacement, label) {
 
 let html = await readFile(htmlPath, "utf8");
 
-const heroProps = [
-  ["controller", "/home-v2/hero-art/figma-prop-controller.png", 658, 658],
-  ["barn", "/home-v2/hero-art/figma-props-sprite.png", 1103, 1426],
-  ["axe", "/home-v2/hero-art/figma-props-sprite.png", 1103, 1426],
-  ["fence", "/home-v2/hero-art/figma-props-sprite.png", 1103, 1426],
-  ["barrel", "/home-v2/hero-art/figma-props-sprite.png", 1103, 1426],
-  ["shovel", "/home-v2/hero-art/figma-props-sprite.png", 1103, 1426],
-];
-const heroPropMarkup = heroProps.map(([name, src, width, height]) => (
-  `<div class="v3-hero-prop v3-hero-prop--${name}" data-hero-prop="${name}"><div class="v3-hero-prop__rotator"><div class="v3-hero-prop__crop"><img src="${src}" alt="" width="${width}" height="${height}" decoding="async" draggable="false"></div></div></div>`
-)).join("");
-const heroArtMarkup = `<div class="v3-hero-art" data-hero-art aria-hidden="true"><div class="v3-hero-art__figma-stage"><span class="v3-hero-art__background is-base"></span><span class="v3-hero-art__background is-amber"></span><span class="v3-hero-art__background is-red"></span><span class="v3-hero-art__wash"></span><span class="v3-hero-art__texture"></span>${heroPropMarkup}</div></div>`;
-
-html = html
-  .replace('<link rel="stylesheet" href="/_astro/hero-models.css?v=1">', "")
-  .replace(/<div class="v3-hero-models"[^>]*><\/div>/, "")
-  .replace(/<script type="module" src="\/_astro\/hero-models-loader\.js\?v=\d+"><\/script>/, "");
-
-if (!html.includes("/_astro/hero-art.css")) {
-  const stylesheetAnchor = html.includes('<link rel="stylesheet" href="/_astro/staged-media.css">')
-    ? '<link rel="stylesheet" href="/_astro/staged-media.css">'
-    : '<link rel="stylesheet" href="/_astro/index.C3NnNlaP.css">';
+if (!html.includes("/_astro/hero-models.css")) {
   html = replaceOnce(
     html,
-    stylesheetAnchor,
-    `${stylesheetAnchor}<link rel="stylesheet" href="/_astro/hero-art.css?v=1">`,
-    "hero art stylesheet",
+    '<link rel="stylesheet" href="/_astro/staged-media.css">',
+    '<link rel="stylesheet" href="/_astro/staged-media.css"><link rel="stylesheet" href="/_astro/hero-models.css?v=1">',
+    "hero models stylesheet",
   );
 }
 
@@ -52,21 +31,21 @@ if (!html.includes("/_astro/font-poppins.css?v=1")) {
   );
 }
 
-if (html.includes("data-hero-art") && !html.includes("v3-hero-art__texture")) {
-  html = replaceOnce(
-    html,
-    '<span class="v3-hero-art__wash"></span>',
-    '<span class="v3-hero-art__wash"></span><span class="v3-hero-art__texture"></span>',
-    "hero art texture",
-  );
-}
-
-if (!html.includes("data-hero-art")) {
+if (!html.includes("data-hero-model-stage")) {
   html = replaceOnce(
     html,
     '<section class="v3-hero" id="create" aria-labelledby="create-title"><div class="v3-hero__content">',
-    `<section class="v3-hero" id="create" aria-labelledby="create-title">${heroArtMarkup}<div class="v3-hero__content">`,
-    "hero art stage",
+    '<section class="v3-hero" id="create" aria-labelledby="create-title"><div class="v3-hero-models" data-hero-model-stage data-hero-model-state="idle" aria-hidden="true"></div><div class="v3-hero__content">',
+    "hero models stage",
+  );
+}
+
+if (!html.includes("/_astro/hero-models-loader.js")) {
+  html = replaceOnce(
+    html,
+    '<script type="module" src="/_astro/hero-native.js"></script>',
+    '<script type="module" src="/_astro/hero-native.js"></script><script type="module" src="/_astro/hero-models-loader.js?v=2"></script>',
+    "hero models loader",
   );
 }
 
@@ -149,6 +128,7 @@ html = html.replaceAll('/home-v2/staged/studio-poster-720.jpg', '/home-v2/staged
 html = html.replaceAll('/home-v2/staged/studio-poster-540.jpg', '/home-v2/staged/studio-v3-poster-540.jpg');
 html = html.replaceAll('src="/_astro/staged-media.js?v=3"', 'src="/_astro/staged-media.js?v=4"');
 html = html.replaceAll('src="/_astro/staged-media.js"', 'src="/_astro/staged-media.js?v=4"');
+html = html.replaceAll('src="/_astro/hero-models-loader.js?v=1"', 'src="/_astro/hero-models-loader.js?v=2"');
 html = html.replace(/ src="(\/home-v2\/staged\/how-[1-4]-poster\.jpg)"/g, ' data-src="$1"');
 for (let step = 1; step <= 4; step += 1) {
   html = html.replaceAll(

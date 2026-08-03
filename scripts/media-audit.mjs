@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const mediaRoot = path.join(root, "home-v2");
 const reportOnly = process.argv.includes("--report");
-const mediaExtensions = new Set([".jpg", ".jpeg", ".png", ".svg", ".webp", ".mp4", ".webm"]);
+const mediaExtensions = new Set([".glb", ".jpg", ".jpeg", ".png", ".svg", ".webp", ".mp4", ".webm"]);
 const sourceExtensions = new Set([".html", ".css", ".js", ".mjs", ".json", ".md", ".xml"]);
 const ignoredDirectories = new Set([".git", "node_modules"]);
 
