@@ -1,0 +1,267 @@
+.v3-hero {
+  align-items: center;
+  isolation: isolate;
+  min-height: clamp(640px, calc(100svh - 68px), 820px);
+  overflow: hidden;
+}
+
+.v3-hero__content {
+  position: relative;
+  z-index: 2;
+}
+
+.v3-hero-art {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  background: #161311;
+}
+
+.v3-hero-art__figma-stage {
+  --figma-frame-width: 1920;
+  --figma-frame-height: 1300;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(100vw, 1920px);
+  height: min(67.708333vw, 1300px);
+  transform: translateX(-50%);
+}
+
+.v3-hero-art__background,
+.v3-hero-art__wash,
+.v3-hero-art__texture {
+  position: absolute;
+  pointer-events: none;
+}
+
+.v3-hero-art__background {
+  left: -5.052083%;
+  top: -15.384615%;
+  width: 110.104167%;
+  filter: blur(220px);
+  filter: blur(clamp(110px, 11.458333vw, 220px));
+}
+
+.v3-hero-art__background.is-base {
+  height: 97.692308%;
+  opacity: 0.6;
+  background: #222b28;
+}
+
+.v3-hero-art__background.is-amber {
+  height: 72.769231%;
+  background: #a35c14;
+}
+
+.v3-hero-art__background.is-red {
+  height: 46.538462%;
+  background: #73241d;
+}
+
+.v3-hero-art__wash {
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(22, 19, 17, 0), #161311);
+}
+
+.v3-hero-art__texture {
+  inset: 0;
+  background-image: radial-gradient(circle at 1.5px 1.5px, #ebe1d714 1.5px, transparent 0);
+  background-size: 32px 32px;
+}
+
+.v3-hero-prop {
+  position: absolute;
+  left: var(--left);
+  top: var(--top);
+  width: var(--width);
+  height: var(--height);
+  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1), filter 360ms ease;
+  transform-origin: 50% 50%;
+}
+
+.v3-hero-prop__rotator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  transform: rotate(var(--rotation, 0deg));
+}
+
+.v3-hero-prop__crop {
+  position: relative;
+  width: var(--crop-width, 100%);
+  height: var(--crop-height, 100%);
+  overflow: hidden;
+}
+
+.v3-hero-prop img {
+  position: absolute;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.v3-hero-prop--controller {
+  --x: 1448;
+  --left: 75.416667%;
+  --top: 11.153846%;
+  --width: 9.478698%;
+  --height: 13.999308%;
+  --crop-width: 81.457%;
+  --crop-height: 81.457%;
+  --rotation: 15.24deg;
+}
+
+.v3-hero-prop--controller img {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.v3-hero-prop--barn {
+  --x: 214;
+  --left: 11.145833%;
+  --top: 8.615385%;
+  --width: 13.135521%;
+  --height: 19.019615%;
+  --crop-width: 82.252%;
+  --crop-height: 81.079%;
+  --rotation: 14.98deg;
+  --sprite-height: 552.71%;
+  --sprite-left: -306.46%;
+  --sprite-top: -119.97%;
+}
+
+.v3-hero-prop--axe {
+  --x: 0;
+  --left: 0%;
+  --top: 22.846154%;
+  --width: 15.371771%;
+  --height: 22.202462%;
+  --crop-width: 75.572%;
+  --crop-height: 71.489%;
+  --rotation: -29.02deg;
+  --sprite-height: 577.33%;
+  --sprite-left: -0.07%;
+  --sprite-top: -238.61%;
+}
+
+.v3-hero-prop--fence {
+  --x: 1496;
+  --left: 77.916667%;
+  --top: 37%;
+  --width: 12.906458%;
+  --height: 18.318692%;
+  --crop-width: 80.888%;
+  --crop-height: 77.864%;
+  --rotation: -17.93deg;
+  --sprite-height: 577.33%;
+  --sprite-left: -206.44%;
+  --sprite-top: -458.91%;
+}
+
+.v3-hero-prop--barrel {
+  --x: 242;
+  --left: 12.604167%;
+  --top: 41.692308%;
+  --width: 10.989583%;
+  --height: 15%;
+  --rotation: 0deg;
+  --sprite-height: 577.33%;
+  --sprite-left: -206.54%;
+  --sprite-top: -123.97%;
+}
+
+.v3-hero-prop--shovel {
+  --x: 1630;
+  --left: 84.895833%;
+  --top: 14.307692%;
+  --width: 16.306302%;
+  --height: 23.760692%;
+  --crop-width: 74.057%;
+  --crop-height: 69.439%;
+  --rotation: 35.17deg;
+  --sprite-height: 577.33%;
+  --sprite-left: -306.8%;
+  --sprite-top: -354.56%;
+}
+
+.v3-hero-prop:not(.v3-hero-prop--controller) img {
+  left: var(--sprite-left);
+  top: var(--sprite-top);
+  width: 413.11%;
+  height: var(--sprite-height);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .v3-hero-prop {
+    pointer-events: auto;
+  }
+
+  .v3-hero-prop:hover {
+    z-index: 2;
+    filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.22));
+    transform: rotate(6deg) scale(1.08);
+  }
+}
+
+@media (width <= 820px) {
+  .v3-hero {
+    min-height: clamp(660px, calc(100svh - 68px), 780px);
+  }
+
+  .v3-hero-art__figma-stage {
+    width: 100%;
+    height: 100%;
+  }
+
+  .v3-hero-art__background {
+    filter: blur(110px);
+  }
+
+  .v3-hero-prop--controller {
+    left: auto;
+    right: 2%;
+    top: 38px;
+    width: 88px;
+    height: 88px;
+  }
+
+  .v3-hero-prop--barn {
+    left: 1%;
+    top: 54px;
+    width: 112px;
+    height: 110px;
+  }
+
+  .v3-hero-prop--barrel {
+    left: -2%;
+    top: auto;
+    bottom: 34px;
+    width: 96px;
+    height: 89px;
+  }
+
+  .v3-hero-prop--axe,
+  .v3-hero-prop--fence,
+  .v3-hero-prop--shovel {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3-hero-prop {
+    transition: none;
+  }
+
+  .v3-hero-prop:hover {
+    filter: none;
+    transform: none;
+  }
+}
