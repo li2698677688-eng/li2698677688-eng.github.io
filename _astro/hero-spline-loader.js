@@ -23,7 +23,7 @@ if (stage && hero) {
     const bounds = hero.getBoundingClientRect();
     const normalizedX = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width) * 2 - 1));
     const normalizedY = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height) * 2 - 1));
-    const pitchDegrees = -normalizedY * MAX_PARALLAX_DEGREES;
+    const pitchDegrees = normalizedY * MAX_PARALLAX_DEGREES;
     const yawDegrees = normalizedX * MAX_PARALLAX_DEGREES;
 
     for (const scene of scenes) {

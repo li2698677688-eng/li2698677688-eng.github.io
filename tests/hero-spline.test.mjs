@@ -15,12 +15,13 @@ test("the hero uses a local transparent mirror of the supplied Spline game", asy
   assert.match(html, /class="v3-hero-spline"/);
   assert.match(
     html,
-    /data-spline-src="\/home-v2\/spline-scenes\/game-transparent\.js\?v=2"/,
+    /data-spline-src="\/home-v2\/spline-scenes\/game-transparent\.js\?v=3"/,
   );
   assert.equal((html.match(/data-spline-scene/g) ?? []).length, 1);
   assert.doesNotMatch(html, /data-spline-src="https:\/\/my\.spline\.design/);
   assert.match(scene, /Mirrored from https:\/\/my\.spline\.design\/game-QnLgzQ729ZbpMexECRHUEk7n\//);
   assert.match(scene, /export async function mountSpline\(canvas\)/);
+  assert.match(scene, /spline-camera-parallax\.js\?v=2/);
   assert.match(scene, /app\._renderer\.setClearAlpha\(0\)/);
   assert.match(scene, /app\._scene\.activePage\.bgColor\.a = 0/);
   assert.doesNotMatch(scene, /app\._renderer\.setClearColor =/);
@@ -36,7 +37,7 @@ test("the transparent Spline fills the hero stage without side-specific masks", 
   assert.match(loader, /dataset\.splineRevealDelay/);
   assert.match(loader, /classList\.add\("is-live"\)/);
   assert.match(css, /\.v3-hero-spline\s*\{[^}]*inset:\s*0/s);
-  assert.match(css, /\.v3-hero-spline canvas\s*\{[^}]*width:\s*110%[^}]*height:\s*110%/s);
+  assert.match(css, /\.v3-hero-spline canvas\s*\{[^}]*top:\s*0[^}]*left:\s*0[^}]*width:\s*100%[^}]*height:\s*100%/s);
   assert.doesNotMatch(css, /mask-image|spline-posters|\.is-left|\.is-right/);
   assert.doesNotMatch(html, /class="v3-hero-spline__poster"/);
 });
@@ -59,6 +60,7 @@ test("the page owns wheel scrolling while mouse parallax is capped at ten degree
   assert.match(loader, /hero\.addEventListener\("pointermove", handlePointerMove/);
   assert.match(loader, /hero\.addEventListener\("pointerleave", resetParallax/);
   assert.match(loader, /Math\.max\(-1, Math\.min\(1,/);
+  assert.match(loader, /const pitchDegrees = normalizedY \* MAX_PARALLAX_DEGREES;/);
   assert.match(loader, /application\?\.setCameraParallax\(yawDegrees, pitchDegrees\)/);
   assert.match(scene, /createSplineCameraParallax/);
   assert.doesNotMatch(loader, /--spline-rotate-x|--spline-rotate-y/);
@@ -81,10 +83,24 @@ test("Spline parallax changes the real camera orbit and returns to its baseline"
   let updateCount = 0;
   let stopDampingCount = 0;
   let renderCount = 0;
+  let projectionUpdateCount = 0;
+  let matrixWorldUpdateCount = 0;
+  const camera = {
+    zoom: 1,
+    position: { x: 20, y: 30, z: 40 },
+    matrixWorld: { elements: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] },
+    updateMatrixWorld() {
+      matrixWorldUpdateCount += 1;
+    },
+    updateProjectionMatrix() {
+      projectionUpdateCount += 1;
+    },
+  };
   const orbit = {
     enableZoom: true,
     enablePan: true,
     enableRotate: true,
+    target: { x: 10, y: 15, z: 25 },
     rotateLeft(value) {
       yawRadians += value;
     },
@@ -116,6 +132,7 @@ test("Spline parallax changes the real camera orbit and returns to its baseline"
   };
   const controller = createSplineCameraParallax(
     {
+      _camera: camera,
       _controls: { orbitControls: orbit },
       _requestRenderAutoMode() {
         renderCount += 1;
@@ -123,6 +140,12 @@ test("Spline parallax changes the real camera orbit and returns to its baseline"
     },
     { requestFrame, cancelFrame },
   );
+
+  assert.equal(camera.zoom, 2, "the real camera doubles the scene size");
+  assert.deepEqual(camera.position, { x: -280, y: 30, z: 40 }, "the camera shifts left along its local horizontal axis");
+  assert.deepEqual(orbit.target, { x: -290, y: 15, z: 25 }, "the orbit target shifts with the camera to center the composition");
+  assert.equal(matrixWorldUpdateCount, 1);
+  assert.equal(projectionUpdateCount, 1);
 
   controller.setCameraParallax(25, -30);
   flushFrames();
@@ -144,13 +167,41 @@ test("Spline parallax changes the real camera orbit and returns to its baseline"
   assert.equal(frames.size, 0);
 });
 
+test("Spline camera framing stays enlarged without over-cropping narrow desktop ratios", async () => {
+  const { createSplineCameraParallax } = await import("../_astro/spline-camera-parallax.js");
+  const camera = {
+    aspect: 1.34,
+    zoom: 1,
+    position: { x: 0, y: 0, z: 0 },
+    matrixWorld: { elements: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] },
+    updateMatrixWorld() {},
+    updateProjectionMatrix() {},
+  };
+  const orbit = {
+    target: { x: 0, y: 0, z: 0 },
+    rotateLeft() {},
+    rotateUp() {},
+    update() {},
+    stopDamping() {},
+  };
+  const controller = createSplineCameraParallax({
+    _camera: camera,
+    _controls: { orbitControls: orbit },
+  });
+
+  assert.equal(camera.zoom, 1.15);
+  assert.deepEqual(camera.position, { x: -300, y: 0, z: 0 });
+  assert.deepEqual(orbit.target, { x: -300, y: 0, z: 0 });
+  controller.dispose();
+});
+
 test("Spline scenes do not block the initial response or load on small screens", async () => {
   const html = await read("index.html");
   const loader = await read("_astro/hero-spline-loader.js");
   const css = await read("_astro/hero-spline.css");
 
-  assert.match(html, /<link rel="stylesheet" href="\/_astro\/hero-spline\.css\?v=6">/);
-  assert.match(html, /<script type="module" src="\/_astro\/hero-spline-loader\.js\?v=5"><\/script>/);
+  assert.match(html, /<link rel="stylesheet" href="\/_astro\/hero-spline\.css\?v=7">/);
+  assert.match(html, /<script type="module" src="\/_astro\/hero-spline-loader\.js\?v=6"><\/script>/);
   assert.doesNotMatch(html, /<iframe[^>]+src="https:\/\/my\.spline\.design|<canvas[^>]+data-spline/);
   assert.match(loader, /requestIdleCallback/);
   assert.match(loader, /IntersectionObserver/);

@@ -27,7 +27,7 @@ function makeTransparent(source) {
 
   return `// Mirrored from ${sourceUrl}; the Spline scene background alpha is removed at runtime.
 import { Application } from "${runtimeUrl}";
-import { createSplineCameraParallax } from "/_astro/spline-camera-parallax.js?v=1";
+import { createSplineCameraParallax } from "/_astro/spline-camera-parallax.js?v=2";
 
 export async function mountSpline(canvas) {
   const app = new Application(canvas);
