@@ -45,11 +45,11 @@ test("the first response defers the Three.js bundle until the hero is idle", asy
 
   assert.match(html, /<link rel="stylesheet" href="\/_astro\/hero-models\.css\?v=1">/);
   assert.match(html, /data-hero-model-stage/);
-  assert.match(html, /<script type="module" src="\/_astro\/hero-models-loader\.js\?v=1"><\/script>/);
+  assert.match(html, /<script type="module" src="\/_astro\/hero-models-loader\.js\?v=2"><\/script>/);
   assert.doesNotMatch(html, /<script[^>]+src="\/_astro\/hero-models\.js/);
   assert.match(loader, /requestIdleCallback/);
   assert.match(loader, /IntersectionObserver/);
-  assert.match(loader, /import\("\/\_astro\/hero-models\.js\?v=1"\)/);
+  assert.match(loader, /import\("\/\_astro\/hero-models\.js\?v=2"\)/);
 });
 
 test("hero GLBs share one event-driven WebGL scene with hover and motion safeguards", async () => {
@@ -63,6 +63,19 @@ test("hero GLBs share one event-driven WebGL scene with hover and motion safegua
   assert.match(source, /Math\.min\(window\.devicePixelRatio, 1\.5\)/);
   assert.match(source, /document\.visibilityState/);
   assert.match(source, /renderer\.dispose\(\)/);
+});
+
+test("hero materials use a targeted vivid color grade instead of a full-canvas filter", async () => {
+  const source = await read("scripts/hero-models.entry.mjs");
+  const css = await read("_astro/hero-models.css");
+
+  assert.match(source, /const VIVID_SATURATION = 1\.42/);
+  assert.match(source, /const VIVID_BRIGHTNESS = 1\.08/);
+  assert.match(source, /const VIVID_CONTRAST = 1\.06/);
+  assert.match(source, /material\.onBeforeCompile/);
+  assert.match(source, /outgoingLight = clamp\(vividColor/);
+  assert.match(source, /material\.customProgramCacheKey/);
+  assert.doesNotMatch(css, /filter:\s*(?:saturate|brightness|contrast)/);
 });
 
 test("mobile keeps only three decorative models and avoids hover-only animation", async () => {

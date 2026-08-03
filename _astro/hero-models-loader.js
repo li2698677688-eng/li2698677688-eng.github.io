@@ -8,7 +8,7 @@ if (stage) {
     started = true;
 
     const importHeroModels = () => {
-      import("/_astro/hero-models.js?v=1").catch(() => {
+      import("/_astro/hero-models.js?v=2").catch(() => {
         stage.dataset.heroModelState = "failed";
       });
     };

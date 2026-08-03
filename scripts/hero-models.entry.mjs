@@ -6,6 +6,41 @@ const HOVER_SCALE = 1.12;
 const REDUCED_MOTION_SCALE = 1.04;
 const ROTATION_SPEED = 2.1;
 const SCALE_EASING = 10;
+const VIVID_SATURATION = 1.42;
+const VIVID_BRIGHTNESS = 1.08;
+const VIVID_CONTRAST = 1.06;
+
+function applyVividColorGrade(root) {
+  const gradedMaterials = new Set();
+
+  root.traverse((object) => {
+    const materials = Array.isArray(object.material) ? object.material : [object.material];
+
+    for (const material of materials) {
+      if (!material || gradedMaterials.has(material)) continue;
+      gradedMaterials.add(material);
+
+      const compileMaterial = material.onBeforeCompile.bind(material);
+      const programCacheKey = material.customProgramCacheKey();
+      material.onBeforeCompile = (shader, renderer) => {
+        compileMaterial(shader, renderer);
+        shader.fragmentShader = shader.fragmentShader.replace(
+          "#include <opaque_fragment>",
+          `
+            vec3 vividColor = outgoingLight;
+            float vividLuma = dot(vividColor, vec3(0.2126, 0.7152, 0.0722));
+            vividColor = mix(vec3(vividLuma), vividColor, ${VIVID_SATURATION});
+            vividColor = (vividColor - vec3(0.5)) * ${VIVID_CONTRAST} + vec3(0.5);
+            outgoingLight = clamp(vividColor * ${VIVID_BRIGHTNESS}, 0.0, 1.0);
+            #include <opaque_fragment>
+          `,
+        );
+      };
+      material.customProgramCacheKey = () => `${programCacheKey}|wanaka-vivid-v1`;
+      material.needsUpdate = true;
+    }
+  });
+}
 
 function disposeMaterial(material, disposedTextures) {
   for (const value of Object.values(material)) {
@@ -130,6 +165,7 @@ async function initHeroModels(stage) {
 
   async function loadModel(config) {
     const gltf = await loader.loadAsync(config.src);
+    applyVividColorGrade(gltf.scene);
     const bounds = new THREE.Box3().setFromObject(gltf.scene);
     if (bounds.isEmpty()) throw new Error(`${config.id} has no visible geometry`);
 

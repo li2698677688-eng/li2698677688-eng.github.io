@@ -44,7 +44,7 @@ if (!html.includes("/_astro/hero-models-loader.js")) {
   html = replaceOnce(
     html,
     '<script type="module" src="/_astro/hero-native.js"></script>',
-    '<script type="module" src="/_astro/hero-native.js"></script><script type="module" src="/_astro/hero-models-loader.js?v=1"></script>',
+    '<script type="module" src="/_astro/hero-native.js"></script><script type="module" src="/_astro/hero-models-loader.js?v=2"></script>',
     "hero models loader",
   );
 }
@@ -128,6 +128,7 @@ html = html.replaceAll('/home-v2/staged/studio-poster-720.jpg', '/home-v2/staged
 html = html.replaceAll('/home-v2/staged/studio-poster-540.jpg', '/home-v2/staged/studio-v3-poster-540.jpg');
 html = html.replaceAll('src="/_astro/staged-media.js?v=3"', 'src="/_astro/staged-media.js?v=4"');
 html = html.replaceAll('src="/_astro/staged-media.js"', 'src="/_astro/staged-media.js?v=4"');
+html = html.replaceAll('src="/_astro/hero-models-loader.js?v=1"', 'src="/_astro/hero-models-loader.js?v=2"');
 html = html.replace(/ src="(\/home-v2\/staged\/how-[1-4]-poster\.jpg)"/g, ' data-src="$1"');
 for (let step = 1; step <= 4; step += 1) {
   html = html.replaceAll(
