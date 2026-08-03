@@ -13,6 +13,14 @@ function replaceOnce(source, pattern, replacement, label) {
 
 let html = await readFile(htmlPath, "utf8");
 
+const splineStageMarkup =
+  '<div class="v3-hero-spline-stage" data-spline-stage data-spline-stage-state="idle"><div class="v3-hero-spline is-left" data-spline-scene data-spline-state="idle" data-spline-delay="900" data-spline-reveal-delay="12000" data-spline-title="White Stardew Valley game console" data-spline-src="https://my.spline.design/gameconsole-C2J75pZy3HyB9XIr6qdhfb9q/"><picture><source media="(min-width: 1101px)" srcset="/home-v2/spline-posters/game-console.webp"><img class="v3-hero-spline__poster" alt="" width="1440" height="900" decoding="async"></picture></div><div class="v3-hero-spline is-right" data-spline-scene data-spline-state="idle" data-spline-delay="0" data-spline-reveal-delay="2500" data-spline-title="Yellow Modite Adventure game console" data-spline-src="https://my.spline.design/moditeadventureldkgame-yudJHbgETLW1FY8UJ2SAgSvk/"><picture><source media="(min-width: 1101px)" srcset="/home-v2/spline-posters/modite-console.webp"><img class="v3-hero-spline__poster" alt="" width="1280" height="720" decoding="async"></picture></div></div>';
+
+html = html.replace(
+  /<div class="v3-hero-spline-stage" data-spline-stage[\s\S]*?<\/div><\/div><div class="v3-hero__content">/,
+  `${splineStageMarkup}<div class="v3-hero__content">`,
+);
+
 if (!html.includes("/_astro/hero-spline.css")) {
   html = replaceOnce(
     html,
@@ -35,7 +43,7 @@ if (!html.includes("data-spline-stage")) {
   html = replaceOnce(
     html,
     '<section class="v3-hero" id="create" aria-labelledby="create-title"><div class="v3-hero__content">',
-    '<section class="v3-hero" id="create" aria-labelledby="create-title"><div class="v3-hero-spline-stage" data-spline-stage data-spline-stage-state="idle"><div class="v3-hero-spline is-left" data-spline-scene data-spline-state="idle" data-spline-delay="900" data-spline-title="White Stardew Valley game console" data-spline-src="https://my.spline.design/gameconsole-C2J75pZy3HyB9XIr6qdhfb9q/"></div><div class="v3-hero-spline is-right" data-spline-scene data-spline-state="idle" data-spline-delay="0" data-spline-title="Yellow Modite Adventure game console" data-spline-src="https://my.spline.design/moditeadventureldkgame-yudJHbgETLW1FY8UJ2SAgSvk/"></div></div><div class="v3-hero__content">',
+    `<section class="v3-hero" id="create" aria-labelledby="create-title">${splineStageMarkup}<div class="v3-hero__content">`,
     "hero Spline stage",
   );
 }

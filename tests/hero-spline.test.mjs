@@ -24,6 +24,28 @@ test("the hero places the two supplied Spline consoles on opposite sides", async
   assert.equal((html.match(/data-spline-scene/g) ?? []).length, 2);
 });
 
+test("exact Spline posters cover the remote scenes during cold startup", async () => {
+  const html = await read("index.html");
+  const loader = await read("_astro/hero-spline-loader.js");
+
+  assert.match(
+    html,
+    /<source media="\(min-width: 1101px\)" srcset="\/home-v2\/spline-posters\/game-console.webp">/,
+  );
+  assert.match(
+    html,
+    /<source media="\(min-width: 1101px\)" srcset="\/home-v2\/spline-posters\/modite-console.webp">/,
+  );
+  assert.equal((html.match(/class="v3-hero-spline__poster"/g) ?? []).length, 2);
+  assert.match(loader, /dataset\.splineRevealDelay/);
+  assert.match(loader, /classList\.add\("is-live"\)/);
+
+  const posterBytes =
+    (await stat(new URL("../home-v2/spline-posters/game-console.webp", import.meta.url))).size
+    + (await stat(new URL("../home-v2/spline-posters/modite-console.webp", import.meta.url))).size;
+  assert.ok(posterBytes <= 60_000, `Spline posters use ${posterBytes} bytes`);
+});
+
 test("Spline scenes do not block the initial response or load on small screens", async () => {
   const html = await read("index.html");
   const loader = await read("_astro/hero-spline-loader.js");

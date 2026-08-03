@@ -13,6 +13,7 @@ if (stage) {
     scheduledTimers = [];
     for (const scene of scenes) {
       scene.querySelector("iframe")?.remove();
+      scene.classList.remove("is-live");
       scene.dataset.splineState = "idle";
     }
     stage.dataset.splineStageState = "idle";
@@ -32,10 +33,17 @@ if (stage) {
     iframe.addEventListener(
       "load",
       () => {
-        scene.dataset.splineState = "ready";
-        if (scenes.every((item) => item.dataset.splineState === "ready")) {
-          stage.dataset.splineStageState = "ready";
-        }
+        const revealDelay = Number(scene.dataset.splineRevealDelay ?? 2500);
+        scheduledTimers.push(
+          window.setTimeout(() => {
+            if (!scene.contains(iframe)) return;
+            scene.dataset.splineState = "ready";
+            scene.classList.add("is-live");
+            if (scenes.every((item) => item.dataset.splineState === "ready")) {
+              stage.dataset.splineStageState = "ready";
+            }
+          }, revealDelay),
+        );
       },
       { once: true },
     );
@@ -43,6 +51,7 @@ if (stage) {
       "error",
       () => {
         scene.dataset.splineState = "failed";
+        scene.classList.remove("is-live");
         iframe.remove();
       },
       { once: true },
