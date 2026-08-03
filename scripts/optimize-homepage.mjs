@@ -13,12 +13,12 @@ function replaceOnce(source, pattern, replacement, label) {
 
 let html = await readFile(htmlPath, "utf8");
 
-if (!html.includes("/_astro/hero-models.css")) {
+if (!html.includes("/_astro/hero-spline.css")) {
   html = replaceOnce(
     html,
     '<link rel="stylesheet" href="/_astro/staged-media.css">',
-    '<link rel="stylesheet" href="/_astro/staged-media.css"><link rel="stylesheet" href="/_astro/hero-models.css?v=1">',
-    "hero models stylesheet",
+    '<link rel="stylesheet" href="/_astro/staged-media.css"><link rel="stylesheet" href="/_astro/hero-spline.css?v=1">',
+    "hero Spline stylesheet",
   );
 }
 
@@ -31,21 +31,21 @@ if (!html.includes("/_astro/font-poppins.css?v=1")) {
   );
 }
 
-if (!html.includes("data-hero-model-stage")) {
+if (!html.includes("data-spline-stage")) {
   html = replaceOnce(
     html,
     '<section class="v3-hero" id="create" aria-labelledby="create-title"><div class="v3-hero__content">',
-    '<section class="v3-hero" id="create" aria-labelledby="create-title"><div class="v3-hero-models" data-hero-model-stage data-hero-model-state="idle" aria-hidden="true"></div><div class="v3-hero__content">',
-    "hero models stage",
+    '<section class="v3-hero" id="create" aria-labelledby="create-title"><div class="v3-hero-spline-stage" data-spline-stage data-spline-stage-state="idle"><div class="v3-hero-spline is-left" data-spline-scene data-spline-state="idle" data-spline-delay="900" data-spline-title="White Stardew Valley game console" data-spline-src="https://my.spline.design/gameconsole-C2J75pZy3HyB9XIr6qdhfb9q/"></div><div class="v3-hero-spline is-right" data-spline-scene data-spline-state="idle" data-spline-delay="0" data-spline-title="Yellow Modite Adventure game console" data-spline-src="https://my.spline.design/moditeadventureldkgame-yudJHbgETLW1FY8UJ2SAgSvk/"></div></div><div class="v3-hero__content">',
+    "hero Spline stage",
   );
 }
 
-if (!html.includes("/_astro/hero-models-loader.js")) {
+if (!html.includes("/_astro/hero-spline-loader.js")) {
   html = replaceOnce(
     html,
     '<script type="module" src="/_astro/hero-native.js"></script>',
-    '<script type="module" src="/_astro/hero-native.js"></script><script type="module" src="/_astro/hero-models-loader.js?v=2"></script>',
-    "hero models loader",
+    '<script type="module" src="/_astro/hero-native.js"></script><script type="module" src="/_astro/hero-spline-loader.js?v=1"></script>',
+    "hero Spline loader",
   );
 }
 
@@ -128,7 +128,6 @@ html = html.replaceAll('/home-v2/staged/studio-poster-720.jpg', '/home-v2/staged
 html = html.replaceAll('/home-v2/staged/studio-poster-540.jpg', '/home-v2/staged/studio-v3-poster-540.jpg');
 html = html.replaceAll('src="/_astro/staged-media.js?v=3"', 'src="/_astro/staged-media.js?v=4"');
 html = html.replaceAll('src="/_astro/staged-media.js"', 'src="/_astro/staged-media.js?v=4"');
-html = html.replaceAll('src="/_astro/hero-models-loader.js?v=1"', 'src="/_astro/hero-models-loader.js?v=2"');
 html = html.replace(/ src="(\/home-v2\/staged\/how-[1-4]-poster\.jpg)"/g, ' data-src="$1"');
 for (let step = 1; step <= 4; step += 1) {
   html = html.replaceAll(
