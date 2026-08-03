@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build:spline-scenes": "node scripts/build-transparent-spline.mjs",
     "optimize": "node scripts/optimize-homepage.mjs",
     "test": "node --test tests/*.test.mjs",
     "media:audit": "node scripts/media-audit.mjs"
