@@ -47,8 +47,8 @@ test("Spline scenes do not block the initial response or load on small screens",
   const loader = await read("_astro/hero-spline-loader.js");
   const css = await read("_astro/hero-spline.css");
 
-  assert.match(html, /<link rel="stylesheet" href="\/_astro\/hero-spline\.css\?v=3">/);
-  assert.match(html, /<script type="module" src="\/_astro\/hero-spline-loader\.js\?v=2"><\/script>/);
+  assert.match(html, /<link rel="stylesheet" href="\/_astro\/hero-spline\.css\?v=4">/);
+  assert.match(html, /<script type="module" src="\/_astro\/hero-spline-loader\.js\?v=3"><\/script>/);
   assert.doesNotMatch(html, /<iframe[^>]+src="https:\/\/my\.spline\.design/);
   assert.match(loader, /requestIdleCallback/);
   assert.match(loader, /IntersectionObserver/);
