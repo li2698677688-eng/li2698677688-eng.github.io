@@ -3,8 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "optimize": "node scripts/optimize-homepage.mjs",
+    "build:hero-models": "node scripts/build-hero-models.mjs",
+    "optimize": "npm run build:hero-models && node scripts/optimize-homepage.mjs",
     "test": "node --test tests/*.test.mjs",
     "media:audit": "node scripts/media-audit.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.1",
+    "three": "0.185.1"
   }
 }

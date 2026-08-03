@@ -13,6 +13,33 @@ function replaceOnce(source, pattern, replacement, label) {
 
 let html = await readFile(htmlPath, "utf8");
 
+if (!html.includes("/_astro/hero-models.css")) {
+  html = replaceOnce(
+    html,
+    '<link rel="stylesheet" href="/_astro/staged-media.css">',
+    '<link rel="stylesheet" href="/_astro/staged-media.css"><link rel="stylesheet" href="/_astro/hero-models.css?v=1">',
+    "hero models stylesheet",
+  );
+}
+
+if (!html.includes("data-hero-model-stage")) {
+  html = replaceOnce(
+    html,
+    '<section class="v3-hero" id="create" aria-labelledby="create-title"><div class="v3-hero__content">',
+    '<section class="v3-hero" id="create" aria-labelledby="create-title"><div class="v3-hero-models" data-hero-model-stage data-hero-model-state="idle" aria-hidden="true"></div><div class="v3-hero__content">',
+    "hero models stage",
+  );
+}
+
+if (!html.includes("/_astro/hero-models-loader.js")) {
+  html = replaceOnce(
+    html,
+    '<script type="module" src="/_astro/hero-native.js"></script>',
+    '<script type="module" src="/_astro/hero-native.js"></script><script type="module" src="/_astro/hero-models-loader.js?v=1"></script>',
+    "hero models loader",
+  );
+}
+
 if (!html.includes("/_astro/staged-media.js")) {
   html = replaceOnce(
     html,
