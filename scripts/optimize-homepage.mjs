@@ -22,6 +22,15 @@ if (!html.includes("/_astro/hero-models.css")) {
   );
 }
 
+if (!html.includes("/_astro/font-poppins.css?v=1")) {
+  html = replaceOnce(
+    html,
+    "</head>",
+    '<link rel="stylesheet" href="/_astro/font-poppins.css?v=1"></head>',
+    "global Poppins stylesheet",
+  );
+}
+
 if (!html.includes("data-hero-model-stage")) {
   html = replaceOnce(
     html,

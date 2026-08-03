@@ -1,0 +1,7 @@
+html,
+body,
+body *,
+body *::before,
+body *::after {
+  font-family: Poppins, sans-serif !important;
+}
