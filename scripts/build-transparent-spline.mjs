@@ -27,6 +27,7 @@ function makeTransparent(source) {
 
   return `// Mirrored from ${sourceUrl}; the Spline scene background alpha is removed at runtime.
 import { Application } from "${runtimeUrl}";
+import { createSplineCameraParallax } from "/_astro/spline-camera-parallax.js?v=1";
 
 export async function mountSpline(canvas) {
   const app = new Application(canvas);
@@ -35,7 +36,14 @@ export async function mountSpline(canvas) {
   app._renderer.setClearColor(app._scene.activePage.bgColor, 0);
   app._renderer.setClearAlpha(0);
   app._requestRenderAutoMode();
-  return app;
+  const cameraParallax = createSplineCameraParallax(app);
+  return {
+    setCameraParallax: cameraParallax.setCameraParallax,
+    dispose() {
+      cameraParallax.dispose();
+      app.dispose();
+    },
+  };
 }
 `;
 }

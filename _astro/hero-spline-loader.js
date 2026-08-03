@@ -13,8 +13,7 @@ if (stage && hero) {
 
   function resetParallax() {
     for (const scene of scenes) {
-      scene.style.setProperty("--spline-rotate-x", "0deg");
-      scene.style.setProperty("--spline-rotate-y", "0deg");
+      activeApplications.get(scene)?.setCameraParallax(0, 0);
     }
   }
 
@@ -24,12 +23,12 @@ if (stage && hero) {
     const bounds = hero.getBoundingClientRect();
     const normalizedX = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width) * 2 - 1));
     const normalizedY = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height) * 2 - 1));
-    const rotateX = -normalizedY * MAX_PARALLAX_DEGREES;
-    const rotateY = normalizedX * MAX_PARALLAX_DEGREES;
+    const pitchDegrees = -normalizedY * MAX_PARALLAX_DEGREES;
+    const yawDegrees = normalizedX * MAX_PARALLAX_DEGREES;
 
     for (const scene of scenes) {
-      scene.style.setProperty("--spline-rotate-x", `${rotateX.toFixed(2)}deg`);
-      scene.style.setProperty("--spline-rotate-y", `${rotateY.toFixed(2)}deg`);
+      const application = activeApplications.get(scene);
+      application?.setCameraParallax(yawDegrees, pitchDegrees);
     }
   }
 
