@@ -2,7 +2,7 @@ let manifestPromise;
 
 function getManifest() {
   if (!manifestPromise) {
-    manifestPromise = fetch("/home-v2/media-manifest.json?v=4", { credentials: "same-origin" })
+    manifestPromise = fetch("/home-v2/media-manifest.json?v=5", { credentials: "same-origin" })
       .then((response) => {
         if (!response.ok) throw new Error(`Media manifest failed: ${response.status}`);
         return response.json();
@@ -33,19 +33,6 @@ const firstScroll = new Promise((resolve) => {
   window.addEventListener("wheel", finish, { passive: true });
   window.addEventListener("touchmove", finish, { passive: true });
 });
-
-function viewport() {
-  return desktopQuery.matches ? "desktop" : "mobile";
-}
-
-function preferredFormat(video) {
-  return video.canPlayType('video/webm; codecs="vp9"') ? "webm" : "mp4";
-}
-
-function formatOrder(video) {
-  const preferred = preferredFormat(video);
-  return preferred === "webm" ? ["webm", "mp4"] : ["mp4", "webm"];
-}
 
 function enqueue(task) {
   const run = loadQueue.then(task, task);
@@ -120,21 +107,6 @@ function loadSequenceVideo(video, source) {
   });
 }
 
-async function loadRendition(video, rendition, preload = "auto") {
-  let finalError;
-  for (const format of formatOrder(video)) {
-    try {
-      return await loadVideo(video, rendition[format], preload);
-    } catch (error) {
-      finalError = error;
-      video.removeAttribute("src");
-      delete video.dataset.source;
-      video.load();
-    }
-  }
-  throw finalError ?? new Error("No supported video rendition");
-}
-
 function hidePicture(container) {
   container.querySelector(".staged-media-picture")?.classList.add("is-hidden");
 }
@@ -152,30 +124,19 @@ async function initializeStudio(container) {
   container.dataset.initialized = "true";
   revealPoster(container);
   if (reducedMotionQuery.matches) return;
-  const manifest = await getManifest();
-  const config = manifest.studio[viewport()];
-  const preview = container.querySelector("[data-studio-preview]");
-  const full = container.querySelector("[data-studio-full]");
-  if (!preview || !full) return;
-  await loadRendition(preview, config.preview);
-  const previewStarted = await preview.play().then(() => true, () => false);
-  if (!previewStarted) return;
-  preview.classList.add("is-playing");
-  hidePicture(container);
-
   if (constrainedNetwork) return;
+  const manifest = await getManifest();
+  const video = container.querySelector("[data-studio-video]");
+  if (!video) return;
   try {
-    await loadRendition(full, config.full);
-    full.currentTime = Math.min(preview.currentTime, Math.max(0, full.duration - 0.05));
-    full.classList.add("is-playing");
-    if (container.dataset.inView === "true") await full.play();
-    else full.pause();
-    window.setTimeout(() => {
-      preview.pause();
-      preview.classList.remove("is-playing");
-    }, 220);
+    await loadVideo(video, manifest.studio.video);
+    const started = await video.play().then(() => true, () => false);
+    if (!started) return;
+    video.classList.add("is-playing");
+    hidePicture(container);
+    if (container.dataset.inView !== "true") video.pause();
   } catch {
-    // The short preview remains a complete visual fallback.
+    // The matching poster remains visible when video playback is unavailable.
   }
 }
 
@@ -197,7 +158,7 @@ if (studio) {
   const playbackObserver = new IntersectionObserver((entries) => {
     const visible = entries.some((entry) => entry.isIntersecting);
     studio.dataset.inView = String(visible);
-    const active = studio.querySelector("[data-studio-full].is-playing, [data-studio-preview].is-playing");
+    const active = studio.querySelector("[data-studio-video].is-playing");
     if (!active) return;
     if (visible) void active.play().catch(() => {});
     else active.pause();

@@ -1,4 +1,4 @@
-const MAX_CAMERA_ANGLE_DEGREES = 10;
+const MAX_CAMERA_ANGLE_DEGREES = 5;
 const NARROW_CAMERA_ASPECT = 1.34;
 const WIDE_CAMERA_ASPECT = 2.49;
 const MIN_CAMERA_ZOOM = 1.15;
@@ -16,6 +16,48 @@ function clampAnglePair(yawDegrees, pitchDegrees) {
     ? MAX_CAMERA_ANGLE_DEGREES / magnitude
     : 1;
   return { yaw: yaw * scale, pitch: pitch * scale };
+}
+
+function computeRenderableCenter(application) {
+  const page = application?._scene?.activePage;
+  if (!page || typeof page.traverse !== "function") return null;
+
+  page.updateMatrixWorld?.(true);
+  const minimum = [Infinity, Infinity, Infinity];
+  const maximum = [-Infinity, -Infinity, -Infinity];
+  let meshCount = 0;
+
+  page.traverse((object) => {
+    if (!object?.isMesh || object.visible === false || !object.geometry) return;
+    object.geometry.computeBoundingBox?.();
+    const box = object.geometry.boundingBox;
+    const matrix = object.matrixWorld?.elements;
+    const bounds = [
+      box?.min?.x, box?.min?.y, box?.min?.z,
+      box?.max?.x, box?.max?.y, box?.max?.z,
+    ];
+    if (!matrix || !bounds.every(Number.isFinite)) return;
+
+    meshCount += 1;
+    for (const x of [box.min.x, box.max.x]) {
+      for (const y of [box.min.y, box.max.y]) {
+        for (const z of [box.min.z, box.max.z]) {
+          const world = [
+            matrix[0] * x + matrix[4] * y + matrix[8] * z + matrix[12],
+            matrix[1] * x + matrix[5] * y + matrix[9] * z + matrix[13],
+            matrix[2] * x + matrix[6] * y + matrix[10] * z + matrix[14],
+          ];
+          for (let axis = 0; axis < 3; axis += 1) {
+            minimum[axis] = Math.min(minimum[axis], world[axis]);
+            maximum[axis] = Math.max(maximum[axis], world[axis]);
+          }
+        }
+      }
+    }
+  });
+
+  if (!meshCount || !minimum.concat(maximum).every(Number.isFinite)) return null;
+  return minimum.map((value, axis) => (value + maximum[axis]) / 2);
 }
 
 function centerAndScaleCamera(application, orbit) {
@@ -47,16 +89,22 @@ function centerAndScaleCamera(application, orbit) {
   ));
   camera.zoom = MIN_CAMERA_ZOOM + (MAX_CAMERA_ZOOM - MIN_CAMERA_ZOOM) * framingProgress;
 
-  // Move the camera and orbit target together so centering preserves true 3D depth.
+  const renderableCenter = computeRenderableCenter(application);
+
+  // Offset the camera for framing, then orbit around the actual rendered model center.
   const offsetX = -rightAxis[0] * CAMERA_HORIZONTAL_SHIFT;
   const offsetY = -rightAxis[1] * CAMERA_HORIZONTAL_SHIFT;
   const offsetZ = -rightAxis[2] * CAMERA_HORIZONTAL_SHIFT;
   position.x += offsetX;
   position.y += offsetY;
   position.z += offsetZ;
-  target.x += offsetX;
-  target.y += offsetY;
-  target.z += offsetZ;
+  if (renderableCenter) {
+    [target.x, target.y, target.z] = renderableCenter;
+  } else {
+    target.x += offsetX;
+    target.y += offsetY;
+    target.z += offsetZ;
+  }
   camera.updateProjectionMatrix();
   orbit.update();
   orbit.stopDamping();

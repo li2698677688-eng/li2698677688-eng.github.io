@@ -1,6 +1,6 @@
 // Mirrored from https://my.spline.design/game-QnLgzQ729ZbpMexECRHUEk7n/; the Spline scene background alpha is removed at runtime.
 import { Application } from "https://unpkg.com/@splinetool/runtime@1.12.98/build/runtime.js";
-import { createSplineCameraParallax } from "/_astro/spline-camera-parallax.js?v=2";
+import { createSplineCameraParallax } from "/_astro/spline-camera-parallax.js?v=3";
 
 export async function mountSpline(canvas) {
   const app = new Application(canvas);

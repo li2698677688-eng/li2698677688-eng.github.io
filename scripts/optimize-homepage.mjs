@@ -14,7 +14,7 @@ function replaceOnce(source, pattern, replacement, label) {
 let html = await readFile(htmlPath, "utf8");
 
 const splineStageMarkup =
-  '<div class="v3-hero-spline-stage" data-spline-stage data-spline-stage-state="idle"><div class="v3-hero-spline" data-spline-scene data-spline-state="idle" data-spline-delay="0" data-spline-reveal-delay="1200" data-spline-src="/home-v2/spline-scenes/game-transparent.js?v=3"></div></div>';
+  '<div class="v3-hero-spline-stage" data-spline-stage data-spline-stage-state="idle"><div class="v3-hero-spline" data-spline-scene data-spline-state="idle" data-spline-delay="0" data-spline-reveal-delay="0" data-spline-src="/home-v2/spline-scenes/game-transparent.js?v=4"></div></div>';
 
 html = html.replace(
   /<div class="v3-hero-spline-stage" data-spline-stage[\s\S]*?<\/div><\/div><div class="v3-hero__content">/,
@@ -25,8 +25,17 @@ if (!html.includes("/_astro/hero-spline.css")) {
   html = replaceOnce(
     html,
     '<link rel="stylesheet" href="/_astro/staged-media.css">',
-    '<link rel="stylesheet" href="/_astro/staged-media.css"><link rel="stylesheet" href="/_astro/hero-spline.css?v=7">',
+    '<link rel="stylesheet" href="/_astro/staged-media.css"><link rel="stylesheet" href="/_astro/hero-spline.css?v=8">',
     "hero Spline stylesheet",
+  );
+}
+
+if (!html.includes('rel="modulepreload" href="https://unpkg.com/@splinetool/runtime@1.12.98/build/runtime.js"')) {
+  html = replaceOnce(
+    html,
+    '<link rel="stylesheet" href="/_astro/SiteFooter.5Tv4HviT.css">',
+    '<link rel="modulepreload" href="https://unpkg.com/@splinetool/runtime@1.12.98/build/runtime.js" crossorigin><link rel="modulepreload" href="/home-v2/spline-scenes/game-transparent.js?v=4"><link rel="stylesheet" href="/_astro/SiteFooter.5Tv4HviT.css">',
+    "hero Spline module preloads",
   );
 }
 
@@ -36,6 +45,15 @@ if (!html.includes("/_astro/font-poppins.css?v=1")) {
     "</head>",
     '<link rel="stylesheet" href="/_astro/font-poppins.css?v=1"></head>',
     "global Poppins stylesheet",
+  );
+}
+
+if (!html.includes("/_astro/home-polish.css")) {
+  html = replaceOnce(
+    html,
+    /<link rel="stylesheet" href="\/_astro\/font-poppins\.css\?v=1">/,
+    '<link rel="stylesheet" href="/_astro/home-polish.css?v=1"><link rel="stylesheet" href="/_astro/font-poppins.css?v=1">',
+    "homepage polish stylesheet",
   );
 }
 
@@ -52,8 +70,17 @@ if (!html.includes("/_astro/hero-spline-loader.js")) {
   html = replaceOnce(
     html,
     '<script type="module" src="/_astro/hero-native.js"></script>',
-    '<script type="module" src="/_astro/hero-native.js"></script><script type="module" src="/_astro/hero-spline-loader.js?v=6"></script>',
+    '<script type="module" src="/_astro/hero-native.js"></script><script type="module" src="/_astro/hero-spline-loader.js?v=7"></script>',
     "hero Spline loader",
+  );
+}
+
+if (!html.includes("/_astro/header-scroll-state.js")) {
+  html = replaceOnce(
+    html,
+    "</header>",
+    '</header><script type="module" src="/_astro/header-scroll-state.js?v=1"></script>',
+    "header scroll state",
   );
 }
 
@@ -107,7 +134,7 @@ if (!html.includes("/_astro/staged-media.js")) {
   html = replaceOnce(
     html,
     /<div class="v3-studio-shot__viewport" data-media-slot="studio-showcase" data-media-kind="animation"><video[^>]+><source src="\/home-v2\/studio-zuizhong\.mp4" type="video\/mp4"><\/video><\/div>/,
-    '<div class="v3-studio-shot__viewport" data-media-slot="studio-showcase" data-media-kind="animation" data-staged-studio><picture class="staged-media-picture"><source media="(max-width: 899px)" data-srcset="/home-v2/staged/studio-v3-poster-540.jpg"><img data-src="/home-v2/staged/studio-v3-poster-720.jpg" alt="Wanaka Studio building a playable 3D island" decoding="async"></picture><video class="staged-studio-video is-preview" aria-label="Wanaka Studio preview" muted playsinline loop preload="none" data-studio-preview></video><video class="staged-studio-video is-full" aria-label="Wanaka Studio building a playable 3D island" muted playsinline loop preload="none" data-studio-full></video></div>',
+    '<div class="v3-studio-shot__viewport" data-media-slot="studio-showcase" data-media-kind="animation" data-staged-studio><picture class="staged-media-picture"><img data-src="/home-v2/staged/studio-zuizhong-poster.jpg" alt="Wanaka Studio building a playable 3D island" loading="lazy" decoding="async"></picture><video class="staged-studio-video" aria-label="Wanaka Studio building a playable 3D island" muted playsinline loop preload="none" data-studio-video></video></div>',
     "studio staged video",
   );
 
@@ -125,30 +152,23 @@ if (!html.includes("/_astro/staged-media.js")) {
   html = replaceOnce(
     html,
     '<script type="module" src="/_astro/HowItWorks.astro_astro_type_script_index_0_lang.B4Q08uM8.js"></script>',
-    '<script type="module" src="/_astro/staged-media.js?v=4"></script><script type="module" src="/_astro/lazy-sections.js"></script>',
+    '<script type="module" src="/_astro/staged-media.js?v=5"></script><script type="module" src="/_astro/lazy-sections.js"></script>',
     "staged media runtime",
   );
 }
 
 html = html.replaceAll(' src="/home-v2/staged/studio-poster-720.jpg"', ' data-src="/home-v2/staged/studio-poster-720.jpg"');
-html = html.replaceAll('/_astro/hero-spline.css?v=1', '/_astro/hero-spline.css?v=4');
-html = html.replaceAll('/_astro/hero-spline.css?v=2', '/_astro/hero-spline.css?v=4');
-html = html.replaceAll('/_astro/hero-spline.css?v=3', '/_astro/hero-spline.css?v=4');
-html = html.replaceAll('/_astro/hero-spline.css?v=4', '/_astro/hero-spline.css?v=5');
-html = html.replaceAll('/_astro/hero-spline.css?v=5', '/_astro/hero-spline.css?v=6');
-html = html.replaceAll('/_astro/hero-spline.css?v=6', '/_astro/hero-spline.css?v=7');
-html = html.replaceAll('/_astro/hero-spline-loader.js?v=1', '/_astro/hero-spline-loader.js?v=4');
-html = html.replaceAll('/_astro/hero-spline-loader.js?v=2', '/_astro/hero-spline-loader.js?v=4');
-html = html.replaceAll('/_astro/hero-spline-loader.js?v=3', '/_astro/hero-spline-loader.js?v=4');
-html = html.replaceAll('/_astro/hero-spline-loader.js?v=4', '/_astro/hero-spline-loader.js?v=5');
-html = html.replaceAll('/_astro/hero-spline-loader.js?v=5', '/_astro/hero-spline-loader.js?v=6');
-html = html.replaceAll('/home-v2/spline-scenes/game-transparent.js?v=1', '/home-v2/spline-scenes/game-transparent.js?v=2');
-html = html.replaceAll('/home-v2/spline-scenes/game-transparent.js?v=2', '/home-v2/spline-scenes/game-transparent.js?v=3');
+html = html.replace(/\/_astro\/hero-spline\.css(?:\?v=\d+)?/g, "/_astro/hero-spline.css?v=8");
+html = html.replace(/\/_astro\/hero-spline-loader\.js(?:\?v=\d+)?/g, "/_astro/hero-spline-loader.js?v=7");
+html = html.replace(/\/home-v2\/spline-scenes\/game-transparent\.js(?:\?v=\d+)?/g, "/home-v2/spline-scenes/game-transparent.js?v=4");
 html = html.replaceAll(' srcset="/home-v2/staged/studio-poster-540.jpg"', ' data-srcset="/home-v2/staged/studio-poster-540.jpg"');
 html = html.replaceAll('/home-v2/staged/studio-poster-720.jpg', '/home-v2/staged/studio-v3-poster-720.jpg');
 html = html.replaceAll('/home-v2/staged/studio-poster-540.jpg', '/home-v2/staged/studio-v3-poster-540.jpg');
-html = html.replaceAll('src="/_astro/staged-media.js?v=3"', 'src="/_astro/staged-media.js?v=4"');
-html = html.replaceAll('src="/_astro/staged-media.js"', 'src="/_astro/staged-media.js?v=4"');
+html = html.replace(/src="\/_astro\/staged-media\.js(?:\?v=\d+)?"/g, 'src="/_astro/staged-media.js?v=5"');
+html = html.replace(
+  /<div class="v3-studio-shot__viewport" data-media-slot="studio-showcase" data-media-kind="animation" data-staged-studio>[\s\S]*?<\/div>(?=<\/div><\/section>)/,
+  '<div class="v3-studio-shot__viewport" data-media-slot="studio-showcase" data-media-kind="animation" data-staged-studio><picture class="staged-media-picture"><img data-src="/home-v2/staged/studio-zuizhong-poster.jpg" alt="Wanaka Studio building a playable 3D island" loading="lazy" decoding="async"></picture><video class="staged-studio-video" aria-label="Wanaka Studio building a playable 3D island" muted playsinline loop preload="none" data-studio-video></video></div>',
+);
 html = html.replace(/ src="(\/home-v2\/staged\/how-[1-4]-poster\.jpg)"/g, ' data-src="$1"');
 for (let step = 1; step <= 4; step += 1) {
   html = html.replaceAll(
@@ -163,8 +183,8 @@ html = html.replaceAll(
 if (!html.includes('/_astro/lazy-sections.js')) {
   html = replaceOnce(
     html,
-    '<script type="module" src="/_astro/staged-media.js?v=4"></script><script type="module" src="/_astro/HowItWorks.astro_astro_type_script_index_0_lang.B4Q08uM8.js"></script>',
-    '<script type="module" src="/_astro/staged-media.js?v=4"></script><script type="module" src="/_astro/lazy-sections.js"></script>',
+    '<script type="module" src="/_astro/staged-media.js?v=5"></script><script type="module" src="/_astro/HowItWorks.astro_astro_type_script_index_0_lang.B4Q08uM8.js"></script>',
+    '<script type="module" src="/_astro/staged-media.js?v=5"></script><script type="module" src="/_astro/lazy-sections.js"></script>',
     "lazy section runtime",
   );
 }

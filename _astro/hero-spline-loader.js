@@ -1,14 +1,12 @@
 const stage = document.querySelector("[data-spline-stage]");
 const hero = stage?.closest(".v3-hero");
-const MAX_PARALLAX_DEGREES = 10;
+const MAX_PARALLAX_DEGREES = 5;
 
 if (stage && hero) {
   const scenes = Array.from(stage.querySelectorAll("[data-spline-scene]"));
   const desktop = window.matchMedia("(min-width: 1101px)");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const activeApplications = new Map();
-  let observer;
-  let idleHandle;
   let scheduledTimers = [];
 
   function resetParallax() {
@@ -64,17 +62,17 @@ if (stage && hero) {
       }
       activeApplications.set(scene, application);
 
-      const revealDelay = Number(scene.dataset.splineRevealDelay ?? 2500);
-      scheduledTimers.push(
-        window.setTimeout(() => {
-          if (!scene.contains(canvas)) return;
-          scene.dataset.splineState = "ready";
-          scene.classList.add("is-live");
-          if (scenes.every((item) => item.dataset.splineState === "ready")) {
-            stage.dataset.splineStageState = "ready";
-          }
-        }, revealDelay),
-      );
+      const reveal = () => {
+        if (!scene.contains(canvas)) return;
+        scene.dataset.splineState = "ready";
+        scene.classList.add("is-live");
+        if (scenes.every((item) => item.dataset.splineState === "ready")) {
+          stage.dataset.splineStageState = "ready";
+        }
+      };
+      const revealDelay = Number(scene.dataset.splineRevealDelay ?? 0);
+      if (revealDelay > 0) scheduledTimers.push(window.setTimeout(reveal, revealDelay));
+      else reveal();
     } catch (error) {
       console.error("Unable to load the hero Spline scene", error);
       scene.dataset.splineState = "failed";
@@ -84,51 +82,25 @@ if (stage && hero) {
   }
 
   function loadScenes() {
-    if (!desktop.matches || reducedMotion.matches) return;
+    if (
+      !desktop.matches
+      || reducedMotion.matches
+      || stage.dataset.splineStageState !== "idle"
+    ) return;
     stage.dataset.splineStageState = "loading";
     for (const scene of scenes) {
       const delay = Number(scene.dataset.splineDelay ?? 0);
-      scheduledTimers.push(window.setTimeout(() => void loadScene(scene), delay));
+      if (delay > 0) scheduledTimers.push(window.setTimeout(() => void loadScene(scene), delay));
+      else void loadScene(scene);
     }
-  }
-
-  function scheduleLoad() {
-    if (stage.dataset.splineStageState !== "idle") return;
-    stage.dataset.splineStageState = "scheduled";
-    const start = () => {
-      idleHandle = undefined;
-      loadScenes();
-    };
-
-    if ("requestIdleCallback" in window) {
-      idleHandle = window.requestIdleCallback(start, { timeout: 2500 });
-    } else {
-      scheduledTimers.push(window.setTimeout(start, 700));
-    }
-  }
-
-  function observeStage() {
-    observer?.disconnect();
-    observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        scheduleLoad();
-      },
-      { rootMargin: "120px 0px" },
-    );
-    observer.observe(stage);
   }
 
   function handlePreferenceChange() {
     if (!desktop.matches || reducedMotion.matches) {
-      if (idleHandle && "cancelIdleCallback" in window) window.cancelIdleCallback(idleHandle);
-      idleHandle = undefined;
-      observer?.disconnect();
       unloadScenes();
       return;
     }
-    observeStage();
+    loadScenes();
   }
 
   desktop.addEventListener("change", handlePreferenceChange);

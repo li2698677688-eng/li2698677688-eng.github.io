@@ -61,12 +61,8 @@
   opacity: 1;
 }
 
-.staged-studio-video.is-full {
+.staged-studio-video {
   z-index: 1;
-}
-
-.staged-studio-video.is-preview {
-  z-index: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

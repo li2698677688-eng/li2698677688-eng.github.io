@@ -1,0 +1,30 @@
+.v3-prompt {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+.v3-prompt-suggestions button {
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.v3-site-header {
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-bottom-color: transparent;
+}
+
+.v3-site-header.is-scrolled {
+  background: #0003;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-bottom-color: #ffffff06;
+}
+
+@media (width > 1100px) {
+  .v3-hero {
+    min-height: clamp(600px, calc(86svh - 68px), 720px);
+    padding: 64px 24px 56px;
+  }
+}

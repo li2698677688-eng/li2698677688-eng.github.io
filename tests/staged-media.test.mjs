@@ -21,11 +21,11 @@ test("the first response does not directly request homepage video or WebP sequen
   assert.doesNotMatch(html, /\ssrc="\/home-v2\/staged\/[^\"]+-poster\.jpg"/);
   assert.doesNotMatch(html, /<script[^>]+src="\/_astro\/(?:HowItWorks|Faq)[^"]+\.js"/);
   assert.match(html, /data-staged-studio/);
-  assert.match(html, /_astro\/staged-media\.js\?v=4/);
+  assert.match(html, /_astro\/staged-media\.js\?v=5/);
   assert.match(html, /_astro\/lazy-sections\.js/);
   assert.doesNotMatch(stagedMedia, /^const manifestPromise = fetch/m);
   assert.match(stagedMedia, /function getManifest\(\)/);
-  assert.match(stagedMedia, /media-manifest\.json\?v=4/);
+  assert.match(stagedMedia, /media-manifest\.json\?v=5/);
 });
 
 test("the how stories use transparent WebM on every browser without sequence fallbacks", async () => {
@@ -33,7 +33,7 @@ test("the how stories use transparent WebM on every browser without sequence fal
   const stagedMedia = await read("_astro/staged-media.js");
   let totalVideoBytes = 0;
 
-  assert.equal(manifest.version, 4);
+  assert.equal(manifest.version, 5);
   assert.equal(manifest.sequences.length, 4);
   for (const [index, sequence] of manifest.sequences.entries()) {
     const step = index + 1;
@@ -53,31 +53,21 @@ test("the how stories use transparent WebM on every browser without sequence fal
     if (error.code === "ENOENT") return [];
     throw error;
   });
-  assert.ok(totalVideoBytes < 1_500_000);
+  assert.ok(totalVideoBytes < 1_000_000);
   assert.deepEqual(legacyFrames, []);
   assert.match(stagedMedia, /await loadSequenceVideo\(video, config\.video\)/);
   assert.doesNotMatch(stagedMedia, /shouldUseWebpSequence|isDesktopSafari|isAppleTouchDevice/);
   assert.doesNotMatch(stagedMedia, /how-sequences|frameImage|context\.drawImage/);
 });
 
-test("the media manifest describes responsive studio media and transparent sequences", async () => {
+test("the media manifest uses the supplied high-resolution Studio video and transparent sequences", async () => {
   const manifest = await readManifest();
 
-  assert.equal(manifest.version, 4);
-  for (const viewport of ["desktop", "mobile"]) {
-    const height = viewport === "desktop" ? 720 : 540;
-    assert.equal(manifest.studio[viewport].poster, `/home-v2/staged/studio-v3-poster-${height}.jpg`);
-    for (const phase of ["preview", "full"]) {
-      assert.equal(
-        manifest.studio[viewport][phase].webm,
-        `/home-v2/staged/studio-v3-${phase}-${height}.webm`,
-      );
-      assert.equal(
-        manifest.studio[viewport][phase].mp4,
-        `/home-v2/staged/studio-v3-${phase}-${height}.mp4`,
-      );
-    }
-  }
+  assert.equal(manifest.version, 5);
+  assert.equal(manifest.studio.poster, "/home-v2/staged/studio-zuizhong-poster.jpg");
+  assert.equal(manifest.studio.video, "/home-v2/staged/studio-zuizhong.mp4");
+  assert.equal(Object.hasOwn(manifest.studio, "desktop"), false);
+  assert.equal(Object.hasOwn(manifest.studio, "mobile"), false);
   assert.equal(manifest.sequences.length, 4);
   for (const sequence of manifest.sequences) {
     assert.equal(sequence.frameCount, 16);
@@ -90,32 +80,25 @@ test("the media manifest describes responsive studio media and transparent seque
 
 test("generated media stays inside the agreed transfer budgets", async () => {
   const manifest = await readManifest();
-  const limits = {
-    desktop: { preview: 1_000_000, fullWebm: 3_500_000, fullMp4: 4_500_000 },
-    mobile: { preview: 600_000, fullWebm: 2_000_000, fullMp4: 2_800_000 },
-  };
-
-  for (const viewport of ["desktop", "mobile"]) {
-    const studio = manifest.studio[viewport];
-    assert.ok((await stat(new URL(`.${studio.preview.webm}`, root))).size <= limits[viewport].preview);
-    assert.ok((await stat(new URL(`.${studio.preview.mp4}`, root))).size <= limits[viewport].preview);
-    assert.ok((await stat(new URL(`.${studio.full.webm}`, root))).size <= limits[viewport].fullWebm);
-    assert.ok((await stat(new URL(`.${studio.full.mp4}`, root))).size <= limits[viewport].fullMp4);
-
-    const transferLimits = viewport === "desktop"
-      ? { webm: 2_100_000, mp4: 1_850_000 }
-      : { webm: 1_350_000, mp4: 1_200_000 };
-    for (const format of ["webm", "mp4"]) {
-      const previewBytes = (await stat(new URL(`.${studio.preview[format]}`, root))).size;
-      const fullBytes = (await stat(new URL(`.${studio.full[format]}`, root))).size;
-      assert.ok(previewBytes + fullBytes <= transferLimits[format]);
-    }
-  }
+  const studioVideo = await stat(new URL(`.${manifest.studio.video}`, root));
+  const studioPoster = await stat(new URL(`.${manifest.studio.poster}`, root));
+  assert.ok(studioVideo.size <= 2_300_000);
+  assert.ok(studioPoster.size <= 180_000);
 
   for (const sequence of manifest.sequences) {
     assert.ok((await stat(new URL(`.${sequence.poster}`, root))).size <= 100_000);
-    assert.ok((await stat(new URL(`.${sequence.video}`, root))).size <= 500_000);
+    assert.ok((await stat(new URL(`.${sequence.video}`, root))).size <= 350_000);
   }
+});
+
+test("the Studio player loads one clear rendition instead of showing a blurry preview first", async () => {
+  const html = await read("index.html");
+  const stagedMedia = await read("_astro/staged-media.js");
+
+  assert.equal((html.match(/data-studio-video/g) ?? []).length, 1);
+  assert.doesNotMatch(html, /data-studio-preview|data-studio-full|is-preview|is-full/);
+  assert.match(stagedMedia, /await loadVideo\(video, manifest\.studio\.video\)/);
+  assert.doesNotMatch(stagedMedia, /loadRendition|preferredFormat|formatOrder|config\.preview|config\.full/);
 });
 
 test("sequence loading is staged near the viewport instead of one screen early", async () => {
