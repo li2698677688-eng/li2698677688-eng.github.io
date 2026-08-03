@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "studio": {
     "desktop": {
       "poster": "/home-v2/staged/studio-v3-poster-720.jpg",
@@ -29,33 +29,25 @@
       "id": "how-1",
       "frameCount": 16,
       "poster": "/home-v2/staged/how-1-poster.jpg",
-      "video": "/home-v2/how-videos/1.webm",
-      "framePrefix": "/home-v2/how-sequences/1/1_",
-      "finalFrame": "/home-v2/how-sequences/1/1_00015.webp"
+      "video": "/home-v2/how-videos/1.webm"
     },
     {
       "id": "how-2",
       "frameCount": 16,
       "poster": "/home-v2/staged/how-2-poster.jpg",
-      "video": "/home-v2/how-videos/2.webm",
-      "framePrefix": "/home-v2/how-sequences/2/2_",
-      "finalFrame": "/home-v2/how-sequences/2/2_00015.webp"
+      "video": "/home-v2/how-videos/2.webm"
     },
     {
       "id": "how-3",
       "frameCount": 16,
       "poster": "/home-v2/staged/how-3-poster.jpg",
-      "video": "/home-v2/how-videos/3.webm",
-      "framePrefix": "/home-v2/how-sequences/3/3_",
-      "finalFrame": "/home-v2/how-sequences/3/3_00015.webp"
+      "video": "/home-v2/how-videos/3.webm"
     },
     {
       "id": "how-4",
       "frameCount": 16,
       "poster": "/home-v2/staged/how-4-poster.jpg",
-      "video": "/home-v2/how-videos/4.webm",
-      "framePrefix": "/home-v2/how-sequences/4/4_",
-      "finalFrame": "/home-v2/how-sequences/4/4_00015.webp"
+      "video": "/home-v2/how-videos/4.webm"
     }
   ]
 }

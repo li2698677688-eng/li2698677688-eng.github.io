@@ -21,53 +21,49 @@ test("the first response does not directly request homepage video or WebP sequen
   assert.doesNotMatch(html, /\ssrc="\/home-v2\/staged\/[^\"]+-poster\.jpg"/);
   assert.doesNotMatch(html, /<script[^>]+src="\/_astro\/(?:HowItWorks|Faq)[^"]+\.js"/);
   assert.match(html, /data-staged-studio/);
-  assert.match(html, /_astro\/staged-media\.js\?v=3/);
+  assert.match(html, /_astro\/staged-media\.js\?v=4/);
   assert.match(html, /_astro\/lazy-sections\.js/);
   assert.doesNotMatch(stagedMedia, /^const manifestPromise = fetch/m);
   assert.match(stagedMedia, /function getManifest\(\)/);
-  assert.match(stagedMedia, /media-manifest\.json\?v=3/);
+  assert.match(stagedMedia, /media-manifest\.json\?v=4/);
 });
 
-test("the how stories use the aggressive transparent videos with WebP fallback frames", async () => {
+test("the how stories use transparent WebM on every browser without sequence fallbacks", async () => {
   const manifest = await readManifest();
   const stagedMedia = await read("_astro/staged-media.js");
   let totalVideoBytes = 0;
 
-  assert.equal(manifest.version, 3);
+  assert.equal(manifest.version, 4);
   assert.equal(manifest.sequences.length, 4);
   for (const [index, sequence] of manifest.sequences.entries()) {
     const step = index + 1;
     assert.equal(sequence.video, `/home-v2/how-videos/${step}.webm`);
-    assert.equal(sequence.framePrefix, `/home-v2/how-sequences/${step}/${step}_`);
-    assert.equal(
-      sequence.finalFrame,
-      `/home-v2/how-sequences/${step}/${step}_00015.webp`,
-    );
+    assert.equal(Object.hasOwn(sequence, "framePrefix"), false);
+    assert.equal(Object.hasOwn(sequence, "finalFrame"), false);
 
     const videoUrl = new URL(`..${sequence.video}`, import.meta.url);
     const videoHeader = (await readFile(videoUrl)).subarray(0, 4);
     assert.deepEqual(videoHeader, Buffer.from([0x1a, 0x45, 0xdf, 0xa3]));
     totalVideoBytes += (await stat(videoUrl)).size;
-
-    const frames = await readdir(new URL(`../home-v2/how-sequences/${step}/`, import.meta.url));
-    assert.equal(
-      frames.filter((file) => new RegExp(`^${step}_\\d{5}\\.webp$`).test(file)).length,
-      16,
-    );
   }
 
+  const legacyFrames = await readdir(new URL("../home-v2/how-sequences/", import.meta.url), {
+    recursive: true,
+  }).catch((error) => {
+    if (error.code === "ENOENT") return [];
+    throw error;
+  });
   assert.ok(totalVideoBytes < 1_500_000);
-  assert.match(stagedMedia, /shouldUseWebpSequence/);
-  assert.match(stagedMedia, /video\.canPlayType\('video\/webm; codecs="vp9"'\)/);
+  assert.deepEqual(legacyFrames, []);
   assert.match(stagedMedia, /await loadSequenceVideo\(video, config\.video\)/);
-  assert.match(stagedMedia, /frameImage\.decode\(\)/);
-  assert.match(stagedMedia, /context\.drawImage\(frameImage/);
+  assert.doesNotMatch(stagedMedia, /shouldUseWebpSequence|isDesktopSafari|isAppleTouchDevice/);
+  assert.doesNotMatch(stagedMedia, /how-sequences|frameImage|context\.drawImage/);
 });
 
 test("the media manifest describes responsive studio media and transparent sequences", async () => {
   const manifest = await readManifest();
 
-  assert.equal(manifest.version, 3);
+  assert.equal(manifest.version, 4);
   for (const viewport of ["desktop", "mobile"]) {
     const height = viewport === "desktop" ? 720 : 540;
     assert.equal(manifest.studio[viewport].poster, `/home-v2/staged/studio-v3-poster-${height}.jpg`);
@@ -87,8 +83,8 @@ test("the media manifest describes responsive studio media and transparent seque
     assert.equal(sequence.frameCount, 16);
     assert.match(sequence.poster, /\.jpg$/);
     assert.match(sequence.video, /\.webm$/);
-    assert.match(sequence.framePrefix, /_$/);
-    assert.match(sequence.finalFrame, /00015\.webp$/);
+    assert.equal(Object.hasOwn(sequence, "framePrefix"), false);
+    assert.equal(Object.hasOwn(sequence, "finalFrame"), false);
   }
 });
 
@@ -119,7 +115,6 @@ test("generated media stays inside the agreed transfer budgets", async () => {
   for (const sequence of manifest.sequences) {
     assert.ok((await stat(new URL(`.${sequence.poster}`, root))).size <= 100_000);
     assert.ok((await stat(new URL(`.${sequence.video}`, root))).size <= 500_000);
-    assert.ok((await stat(new URL(`.${sequence.finalFrame}`, root))).size <= 700_000);
   }
 });
 

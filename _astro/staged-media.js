@@ -2,7 +2,7 @@ let manifestPromise;
 
 function getManifest() {
   if (!manifestPromise) {
-    manifestPromise = fetch("/home-v2/media-manifest.json?v=3", { credentials: "same-origin" })
+    manifestPromise = fetch("/home-v2/media-manifest.json?v=4", { credentials: "same-origin" })
       .then((response) => {
         if (!response.ok) throw new Error(`Media manifest failed: ${response.status}`);
         return response.json();
@@ -16,12 +16,6 @@ const desktopQuery = matchMedia("(min-width: 900px)");
 const reducedMotionQuery = matchMedia("(prefers-reduced-motion: reduce)");
 const connection = navigator.connection ?? navigator.mozConnection ?? navigator.webkitConnection;
 const constrainedNetwork = Boolean(connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType ?? ""));
-const userAgent = navigator.userAgent;
-const isAppleTouchDevice = /iP(?:ad|hone|od)/i.test(userAgent)
-  || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-const isDesktopSafari = /Safari/i.test(userAgent)
-  && !/(?:Chrome|Chromium|CriOS|Edg|EdgiOS|OPR|Firefox|FxiOS)/i.test(userAgent);
-const shouldUseWebpSequence = isAppleTouchDevice || isDesktopSafari;
 let loadQueue = Promise.resolve();
 
 const firstScroll = new Promise((resolve) => {
@@ -220,76 +214,13 @@ function createSequence(stage, frameCount) {
   const step = stage.dataset.mediaId?.match(/^how-([1-4])$/)?.[1];
   if (!step) return null;
 
-  const framePrefix = `/home-v2/how-sequences/${step}/${step}_`;
-  const finalFrame = `${framePrefix}00015.webp`;
-  poster.dataset.src = shouldUseWebpSequence
-    ? finalFrame
-    : `/home-v2/staged/how-${step}-poster.jpg`;
-
-  let canvas = stage.querySelector("[data-staged-sequence-canvas]");
-  if (!canvas) {
-    canvas = document.createElement("canvas");
-    canvas.className = "v3-process-sequence__canvas staged-sequence-canvas";
-    canvas.width = 960;
-    canvas.height = 644;
-    canvas.setAttribute("aria-hidden", "true");
-    canvas.dataset.stagedSequenceCanvas = "";
-    video.insertAdjacentElement("afterend", canvas);
-  }
-  const context = canvas.getContext("2d", { alpha: true });
-  if (!context) return null;
-
-  const frames = Array.from(
-    { length: frameCount },
-    (_, index) => `${framePrefix}${String(index).padStart(5, "0")}.webp`,
-  );
-  const frameImages = Array(frameCount);
-  const decodePromises = Array(frameCount);
-  let useVideo = !shouldUseWebpSequence
-    && video.canPlayType('video/webm; codecs="vp9"') !== "";
+  poster.dataset.src = `/home-v2/staged/how-${step}-poster.jpg`;
   let ready = false;
   let desiredFrame = 0;
   let renderedFrame = -1;
   let playedOnMobile = false;
   let showingFallback = false;
   let preloadPromise;
-
-  const waitForLoad = (frameImage) => new Promise((resolve, reject) => {
-    if (frameImage.complete) {
-      if (frameImage.naturalWidth > 0) resolve();
-      else reject(new Error("Sequence frame failed to load"));
-      return;
-    }
-    frameImage.addEventListener("load", resolve, { once: true });
-    frameImage.addEventListener("error", reject, { once: true });
-  });
-
-  function ensureFrame(index) {
-    if (decodePromises[index]) return decodePromises[index];
-    const frameImage = new Image();
-    frameImage.decoding = "async";
-    frameImage.src = frames[index];
-    frameImages[index] = frameImage;
-    decodePromises[index] = frameImage.decode()
-      .catch(() => waitForLoad(frameImage))
-      .then(() => frameImage);
-    return decodePromises[index];
-  }
-
-  function drawFrame(frameImage, index) {
-    if (showingFallback || index !== desiredFrame || index === renderedFrame) return;
-    if (!frameImage.naturalWidth || !frameImage.naturalHeight) return;
-
-    if (canvas.width !== frameImage.naturalWidth) canvas.width = frameImage.naturalWidth;
-    if (canvas.height !== frameImage.naturalHeight) canvas.height = frameImage.naturalHeight;
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
-    renderedFrame = index;
-    stage.dataset.howSequenceFrameIndex = String(index);
-    video.classList.remove("is-ready");
-    canvas.classList.add("is-ready");
-    poster.classList.add("is-canvas-ready");
-  }
 
   function videoTimeForFrame(index) {
     return Math.min(
@@ -299,7 +230,7 @@ function createSequence(stage, frameCount) {
   }
 
   function revealVideoFrame() {
-    if (!useVideo || !ready || showingFallback || video.readyState < 2) return;
+    if (!ready || showingFallback || video.readyState < 2) return;
     const frameAtReveal = desiredFrame;
     const expectedTime = videoTimeForFrame(frameAtReveal);
     if (Math.abs(video.currentTime - expectedTime) > 1 / 120) {
@@ -309,8 +240,7 @@ function createSequence(stage, frameCount) {
 
     requestAnimationFrame(() => {
       if (
-        !useVideo
-        || showingFallback
+        showingFallback
         || desiredFrame !== frameAtReveal
         || Math.abs(video.currentTime - expectedTime) > 1 / 120
       ) {
@@ -319,7 +249,6 @@ function createSequence(stage, frameCount) {
       }
       renderedFrame = frameAtReveal;
       stage.dataset.howSequenceFrameIndex = String(frameAtReveal);
-      canvas.classList.remove("is-ready");
       video.classList.add("is-ready");
       poster.classList.add("is-canvas-ready");
     });
@@ -327,8 +256,7 @@ function createSequence(stage, frameCount) {
 
   function seekVideoFrame() {
     if (
-      !useVideo
-      || !ready
+      !ready
       || showingFallback
       || video.readyState < 1
       || !Number.isFinite(video.duration)
@@ -346,11 +274,7 @@ function createSequence(stage, frameCount) {
 
   async function preload() {
     revealPoster(stage);
-    if (
-      reducedMotionQuery.matches
-      || constrainedNetwork
-      || (shouldUseWebpSequence && !desktopQuery.matches)
-    ) return;
+    if (reducedMotionQuery.matches || constrainedNetwork) return;
     if (preloadPromise) return preloadPromise;
 
     preloadPromise = (async () => {
@@ -358,25 +282,9 @@ function createSequence(stage, frameCount) {
       const config = manifest.sequences.find((item) => item.id === stage.dataset.mediaId);
       if (!config) throw new Error(`Missing sequence ${stage.dataset.mediaId}`);
 
-      if (useVideo) {
-        try {
-          await loadSequenceVideo(video, config.video);
-          ready = true;
-          seekVideoFrame();
-          return;
-        } catch {
-          useVideo = false;
-          video.removeAttribute("src");
-          delete video.dataset.source;
-          video.load();
-        }
-      }
-
+      await loadSequenceVideo(video, config.video);
       ready = true;
-      void Promise.allSettled(frames.map((_, index) => ensureFrame(index)));
-      const frameAtPreload = desiredFrame;
-      await ensureFrame(frameAtPreload);
-      drawFrame(frameImages[frameAtPreload], frameAtPreload);
+      seekVideoFrame();
     })();
     return preloadPromise;
   }
@@ -386,14 +294,7 @@ function createSequence(stage, frameCount) {
     desiredFrame = Math.min(frameCount - 1, Math.max(0, Math.round(frame)));
     if (desiredFrame === renderedFrame) return;
     if (!ready) return;
-    if (useVideo) {
-      seekVideoFrame();
-      return;
-    }
-    const frameAtRender = desiredFrame;
-    void ensureFrame(frameAtRender)
-      .then((frameImage) => drawFrame(frameImage, frameAtRender))
-      .catch(() => {});
+    seekVideoFrame();
   }
 
   function showFallback() {
@@ -403,20 +304,15 @@ function createSequence(stage, frameCount) {
     stage.dataset.howSequenceFrameIndex = String(frameCount - 1);
     video.pause();
     video.classList.remove("is-ready");
-    canvas.classList.remove("is-ready");
     poster.classList.remove("is-canvas-ready");
   }
 
   async function playOnce() {
     if (playedOnMobile || desktopQuery.matches || reducedMotionQuery.matches || constrainedNetwork) return;
     playedOnMobile = true;
-    if (shouldUseWebpSequence) {
-      showFallback();
-      return;
-    }
     try {
       await preload();
-      if (!useVideo || !ready) return;
+      if (!ready) return;
       showingFallback = false;
       video.currentTime = 0;
       video.loop = false;
@@ -440,7 +336,7 @@ function createSequence(stage, frameCount) {
   }, { threshold: [0.25] });
   mobilePlaybackObserver.observe(stage);
 
-  return { canvas, frameCount, playOnce, poster, preload, render, showFallback, stage, video };
+  return { frameCount, playOnce, poster, preload, render, showFallback, stage, video };
 }
 
 window.WanakaStagedMedia = { createSequence };
