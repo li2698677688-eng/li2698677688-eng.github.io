@@ -25,7 +25,6 @@ if (stage) {
     const iframe = document.createElement("iframe");
     iframe.loading = "lazy";
     iframe.title = scene.dataset.splineTitle ?? "Interactive 3D game console";
-    iframe.tabIndex = -1;
     iframe.allow = "fullscreen";
     iframe.referrerPolicy = "strict-origin-when-cross-origin";
 

@@ -55,6 +55,8 @@ test("Spline scenes do not block the initial response or load on small screens",
   assert.match(loader, /matchMedia\("\(min-width: 1101px\)"\)/);
   assert.match(loader, /dataset\.splineSrc/);
   assert.match(loader, /iframe\.loading = "lazy"/);
+  assert.match(loader, /iframe\.title = scene\.dataset\.splineTitle/);
+  assert.doesNotMatch(loader, /iframe\.tabIndex = -1/);
   assert.match(css, /@media \(width <= 1100px\)/);
   assert.match(css, /\.v3-hero-spline-stage\s*\{[^}]*display:\s*none/s);
 
