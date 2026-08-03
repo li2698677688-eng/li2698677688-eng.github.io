@@ -8,64 +8,38 @@ async function read(path) {
   return readFile(new URL(path, root), "utf8");
 }
 
-test("the hero places the two supplied Spline consoles on opposite sides", async () => {
+test("the hero uses the supplied Spline game as one full-stage scene", async () => {
   const html = await read("index.html");
-  const buildScript = await read("scripts/build-transparent-spline.mjs");
 
-  assert.match(html, /class="v3-hero-spline is-left"/);
-  assert.match(html, /class="v3-hero-spline is-right"/);
+  assert.match(html, /class="v3-hero-spline"/);
   assert.match(
     html,
-    /data-spline-src="\/home-v2\/spline-scenes\/game-console\.html"/,
+    /data-spline-src="https:\/\/my\.spline\.design\/game-QnLgzQ729ZbpMexECRHUEk7n\/"/,
   );
-  assert.match(
-    html,
-    /data-spline-src="\/home-v2\/spline-scenes\/modite-console\.html"/,
-  );
-  assert.match(buildScript, /gameconsole-C2J75pZy3HyB9XIr6qdhfb9q/);
-  assert.match(buildScript, /moditeadventureldkgame-yudJHbgETLW1FY8UJ2SAgSvk/);
-  assert.equal((html.match(/data-spline-scene/g) ?? []).length, 2);
+  assert.equal((html.match(/data-spline-scene/g) ?? []).length, 1);
+  assert.doesNotMatch(html, /spline-scenes\/(?:game|modite)-console\.html/);
 });
 
-test("the mirrored Spline canvases override their authored backgrounds with transparency", async () => {
-  const gameConsole = await read("home-v2/spline-scenes/game-console.html");
-  const moditeConsole = await read("home-v2/spline-scenes/modite-console.html");
-
-  for (const scene of [gameConsole, moditeConsole]) {
-    assert.match(scene, /background:\s*transparent/);
-    assert.match(scene, /app\.setBackgroundColor\(['"]rgba\(0,0,0,0\)['"]\)/);
-    assert.doesNotMatch(scene, /body\s*\{[^}]*background:\s*rgba\([^)]*,\s*1\)/s);
-  }
-});
-
-test("exact transparent Spline posters cover the mirrored scenes during cold startup", async () => {
+test("the supplied Spline fills the hero stage without side-specific masks", async () => {
   const html = await read("index.html");
   const loader = await read("_astro/hero-spline-loader.js");
   const css = await read("_astro/hero-spline.css");
 
-  assert.match(
-    html,
-    /<source media="\(min-width: 1101px\)" srcset="\/home-v2\/spline-posters\/game-console.webp\?v=2">/,
-  );
-  assert.match(
-    html,
-    /<source media="\(min-width: 1101px\)" srcset="\/home-v2\/spline-posters\/modite-console.webp\?v=2">/,
-  );
-  assert.equal((html.match(/class="v3-hero-spline__poster"/g) ?? []).length, 2);
   assert.match(loader, /dataset\.splineRevealDelay/);
   assert.match(loader, /classList\.add\("is-live"\)/);
-  assert.match(css, /is-left iframe[\s\S]*game-console-mask\.png/);
-  assert.match(css, /is-right iframe[\s\S]*modite-console-mask\.png/);
+  assert.match(css, /\.v3-hero-spline\s*\{[^}]*inset:\s*0/s);
+  assert.match(css, /\.v3-hero-spline iframe\s*\{[^}]*width:\s*100%[^}]*height:\s*100%/s);
+  assert.doesNotMatch(css, /mask-image|spline-posters|\.is-left|\.is-right/);
+  assert.doesNotMatch(html, /class="v3-hero-spline__poster"/);
+});
 
-  const posterBytes =
-    (await stat(new URL("../home-v2/spline-posters/game-console.webp", import.meta.url))).size
-    + (await stat(new URL("../home-v2/spline-posters/modite-console.webp", import.meta.url))).size;
-  assert.ok(posterBytes <= 60_000, `Spline posters use ${posterBytes} bytes`);
+test("the hero switches to readable light-canvas controls only when Spline is ready", async () => {
+  const css = await read("_astro/hero-spline.css");
 
-  const maskBytes =
-    (await stat(new URL("../home-v2/spline-posters/game-console-mask.png", import.meta.url))).size
-    + (await stat(new URL("../home-v2/spline-posters/modite-console-mask.png", import.meta.url))).size;
-  assert.ok(maskBytes <= 60_000, `Spline masks use ${maskBytes} bytes`);
+  assert.match(css, /\[data-spline-stage-state="ready"\]\s*\+\s*\.v3-hero__content h1\s*\{[^}]*color:\s*#140e10/s);
+  assert.match(css, /\[data-spline-stage-state="ready"\][\s\S]*\.v3-prompt\s*\{[^}]*background:\s*rgba\(255,\s*255,\s*255,\s*0\.72\)/s);
+  assert.match(css, /\[data-spline-stage-state="ready"\][\s\S]*\.v3-prompt textarea::placeholder\s*\{[^}]*rgba\(20,\s*14,\s*16,\s*0\.48\)/s);
+  assert.doesNotMatch(css, /\.v3-hero__content::before|radial-gradient/);
 });
 
 test("Spline scenes do not block the initial response or load on small screens", async () => {

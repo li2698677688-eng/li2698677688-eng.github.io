@@ -19,45 +19,17 @@
 
 .v3-hero-spline {
   position: absolute;
-  top: clamp(44px, 7svh, 72px);
-  bottom: clamp(28px, 5svh, 52px);
-  width: clamp(220px, 19vw, 390px);
-  opacity: 0.9;
+  inset: 0;
   overflow: hidden;
   pointer-events: auto;
-  transform: scale(1);
-  transform-origin: center;
-  transition: opacity 500ms ease, transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.v3-hero-spline.is-left {
-  left: max(16px, calc((100vw - 1280px) * 0.25 + 16px));
-}
-
-.v3-hero-spline.is-right {
-  right: max(16px, calc((100vw - 1280px) * 0.25 + 16px));
-}
-
-.v3-hero-spline__poster,
 .v3-hero-spline iframe {
   display: block;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  max-width: none;
+  width: 100%;
+  height: 100%;
   border: 0;
   background: transparent;
-  filter: saturate(1.08) contrast(1.04);
-}
-
-.v3-hero-spline__poster {
-  z-index: 1;
-  pointer-events: none;
-  transition: opacity 500ms ease;
-}
-
-.v3-hero-spline iframe {
-  z-index: 2;
   opacity: 0;
   pointer-events: none;
   transition: opacity 500ms ease;
@@ -68,44 +40,40 @@
   pointer-events: auto;
 }
 
-.v3-hero-spline.is-live .v3-hero-spline__poster {
-  opacity: 0;
+.v3-hero-spline-stage[data-spline-stage-state="ready"] + .v3-hero__content h1 {
+  color: #140e10;
 }
 
-.v3-hero-spline.is-left .v3-hero-spline__poster,
-.v3-hero-spline.is-left iframe {
-  width: 1440px;
-  height: 900px;
-  transform: translate(-50%, -50%) scale(0.46);
-  -webkit-mask-image: url("/home-v2/spline-posters/game-console-mask.png?v=1");
-  mask-image: url("/home-v2/spline-posters/game-console-mask.png?v=1");
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
+.v3-hero-spline-stage[data-spline-stage-state="ready"] + .v3-hero__content .v3-hero__copy {
+  color: rgba(20, 14, 16, 0.68);
 }
 
-.v3-hero-spline.is-right .v3-hero-spline__poster,
-.v3-hero-spline.is-right iframe {
-  width: 1280px;
-  height: 720px;
-  transform: translate(-50%, -50%) scale(1.1);
-  -webkit-mask-image: url("/home-v2/spline-posters/modite-console-mask.png?v=1");
-  mask-image: url("/home-v2/spline-posters/modite-console-mask.png?v=1");
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
+.v3-hero-spline-stage[data-spline-stage-state="ready"] + .v3-hero__content .v3-prompt {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(20, 14, 16, 0.12);
+  box-shadow: 0 12px 36px rgba(44, 83, 84, 0.14);
 }
 
-@media (1101px <= width <= 1240px) {
-  .v3-hero-spline {
-    opacity: 0.72;
-  }
+.v3-hero-spline-stage[data-spline-stage-state="ready"] + .v3-hero__content .v3-prompt textarea {
+  color: #140e10;
+}
+
+.v3-hero-spline-stage[data-spline-stage-state="ready"] + .v3-hero__content .v3-prompt textarea::placeholder {
+  color: rgba(20, 14, 16, 0.48);
+}
+
+.v3-hero-spline-stage[data-spline-stage-state="ready"] + .v3-hero__content .v3-prompt__add img {
+  filter: brightness(0) saturate(100%);
+}
+
+.v3-hero-spline-stage[data-spline-stage-state="ready"] + .v3-hero__content .v3-prompt-suggestions button {
+  color: rgba(20, 14, 16, 0.74);
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(20, 14, 16, 0.08);
+}
+
+.v3-hero-spline-stage[data-spline-stage-state="ready"] + .v3-hero__content .v3-prompt-suggestions button:hover {
+  background: rgba(255, 255, 255, 0.84);
 }
 
 @media (width <= 1100px) {
@@ -123,9 +91,5 @@
 @media (prefers-reduced-motion: reduce) {
   .v3-hero-spline-stage {
     display: none;
-  }
-
-  .v3-hero-spline {
-    transition: none;
   }
 }

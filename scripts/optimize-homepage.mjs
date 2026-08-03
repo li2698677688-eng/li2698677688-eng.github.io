@@ -14,7 +14,7 @@ function replaceOnce(source, pattern, replacement, label) {
 let html = await readFile(htmlPath, "utf8");
 
 const splineStageMarkup =
-  '<div class="v3-hero-spline-stage" data-spline-stage data-spline-stage-state="idle"><div class="v3-hero-spline is-left" data-spline-scene data-spline-state="idle" data-spline-delay="900" data-spline-reveal-delay="12000" data-spline-title="White Stardew Valley game console" data-spline-src="/home-v2/spline-scenes/game-console.html"><picture><source media="(min-width: 1101px)" srcset="/home-v2/spline-posters/game-console.webp?v=2"><img class="v3-hero-spline__poster" alt="" width="1440" height="900" decoding="async"></picture></div><div class="v3-hero-spline is-right" data-spline-scene data-spline-state="idle" data-spline-delay="0" data-spline-reveal-delay="2500" data-spline-title="Yellow Modite Adventure game console" data-spline-src="/home-v2/spline-scenes/modite-console.html"><picture><source media="(min-width: 1101px)" srcset="/home-v2/spline-posters/modite-console.webp?v=2"><img class="v3-hero-spline__poster" alt="" width="1280" height="720" decoding="async"></picture></div></div>';
+  '<div class="v3-hero-spline-stage" data-spline-stage data-spline-stage-state="idle"><div class="v3-hero-spline" data-spline-scene data-spline-state="idle" data-spline-delay="0" data-spline-reveal-delay="1200" data-spline-title="Interactive floating-island game scene" data-spline-src="https://my.spline.design/game-QnLgzQ729ZbpMexECRHUEk7n/"></div></div>';
 
 html = html.replace(
   /<div class="v3-hero-spline-stage" data-spline-stage[\s\S]*?<\/div><\/div><div class="v3-hero__content">/,
