@@ -31,6 +31,12 @@ const sources = await Promise.all(sourceFiles.map(async (file) => ({
   file,
   text: await readFile(file, "utf8"),
 })));
+const mediaManifest = JSON.parse(
+  await readFile(path.join(mediaRoot, "media-manifest.json"), "utf8"),
+);
+const sequencePrefixes = (mediaManifest.sequences ?? [])
+  .map((sequence) => sequence.framePrefix)
+  .filter((prefix) => typeof prefix === "string" && prefix.length > 0);
 const mediaFiles = allFiles.filter((file) => file.startsWith(`${mediaRoot}${path.sep}`)
   && mediaExtensions.has(path.extname(file).toLowerCase()));
 
@@ -42,7 +48,8 @@ for (const file of mediaFiles) {
   const size = (await stat(file)).size;
   mediaBytes += size;
   const referenced = sources.some(({ file: sourceFile, text }) => sourceFile !== file
-    && (text.includes(publicPath) || text.includes(relative)));
+    && (text.includes(publicPath) || text.includes(relative)))
+    || sequencePrefixes.some((prefix) => publicPath.startsWith(prefix));
   if (!referenced) orphaned.push({ path: relative, size });
 }
 

@@ -1,6 +1,7 @@
 .staged-media-picture,
 .staged-studio-video,
-.staged-sequence-video {
+.staged-sequence-video,
+.staged-sequence-canvas {
   height: 100%;
   inset: 0;
   position: absolute;
@@ -45,7 +46,8 @@
 }
 
 .staged-studio-video,
-.staged-sequence-video {
+.staged-sequence-video,
+.staged-sequence-canvas {
   background: transparent;
   object-fit: contain;
   opacity: 0;
@@ -54,7 +56,8 @@
 }
 
 .staged-studio-video.is-playing,
-.staged-sequence-video.is-ready {
+.staged-sequence-video.is-ready,
+.staged-sequence-canvas.is-ready {
   opacity: 1;
 }
 
@@ -68,7 +71,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .staged-studio-video,
-  .staged-sequence-video {
+  .staged-sequence-video,
+  .staged-sequence-canvas {
     display: none;
   }
 }

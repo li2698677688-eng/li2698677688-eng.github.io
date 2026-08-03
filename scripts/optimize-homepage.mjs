@@ -74,7 +74,7 @@ if (!html.includes("/_astro/staged-media.js")) {
     const match = html.match(sequencePattern);
     if (!match) throw new Error(`sequence ${step}: expected exactly one match`);
     const [, classes, extraAttributes, alt] = match;
-    const replacement = `<div class="${classes}"${extraAttributes}data-media-id="how-${step}" data-how-sequence-frame-count="16"><img class="v3-process-sequence__fallback" data-src="/home-v2/staged/how-${step}-poster.jpg" alt="${alt}" decoding="async" data-how-sequence-fallback><video class="v3-process-sequence__canvas staged-sequence-video" muted playsinline preload="none" aria-hidden="true" data-staged-sequence></video></div>`;
+    const replacement = `<div class="${classes}"${extraAttributes}data-media-id="how-${step}" data-how-sequence-frame-count="16"><img class="v3-process-sequence__fallback" data-sequence-fallback-step="${step}" alt="${alt}" decoding="async" data-how-sequence-fallback><video class="v3-process-sequence__video staged-sequence-video" muted playsinline preload="none" aria-hidden="true" data-staged-sequence></video></div>`;
     html = html.replace(sequencePattern, replacement);
   }
 
@@ -89,6 +89,16 @@ if (!html.includes("/_astro/staged-media.js")) {
 html = html.replaceAll(' src="/home-v2/staged/studio-poster-720.jpg"', ' data-src="/home-v2/staged/studio-poster-720.jpg"');
 html = html.replaceAll(' srcset="/home-v2/staged/studio-poster-540.jpg"', ' data-srcset="/home-v2/staged/studio-poster-540.jpg"');
 html = html.replace(/ src="(\/home-v2\/staged\/how-[1-4]-poster\.jpg)"/g, ' data-src="$1"');
+for (let step = 1; step <= 4; step += 1) {
+  html = html.replaceAll(
+    ` data-src="/home-v2/staged/how-${step}-poster.jpg"`,
+    ` data-sequence-fallback-step="${step}"`,
+  );
+}
+html = html.replaceAll(
+  'class="v3-process-sequence__canvas staged-sequence-video"',
+  'class="v3-process-sequence__video staged-sequence-video"',
+);
 if (!html.includes('/_astro/lazy-sections.js')) {
   html = replaceOnce(
     html,
