@@ -1,33 +1,7 @@
 {
-  "version": 5,
+  "version": 7,
   "studio": {
     "poster": "/home-v2/staged/studio-zuizhong-poster.jpg",
-    "video": "/home-v2/staged/studio-zuizhong.mp4"
-  },
-  "sequences": [
-    {
-      "id": "how-1",
-      "frameCount": 16,
-      "poster": "/home-v2/staged/how-1-poster.jpg",
-      "video": "/home-v2/how-videos/1.webm"
-    },
-    {
-      "id": "how-2",
-      "frameCount": 16,
-      "poster": "/home-v2/staged/how-2-poster.jpg",
-      "video": "/home-v2/how-videos/2.webm"
-    },
-    {
-      "id": "how-3",
-      "frameCount": 16,
-      "poster": "/home-v2/staged/how-3-poster.jpg",
-      "video": "/home-v2/how-videos/3.webm"
-    },
-    {
-      "id": "how-4",
-      "frameCount": 16,
-      "poster": "/home-v2/staged/how-4-poster.jpg",
-      "video": "/home-v2/how-videos/4.webm"
-    }
-  ]
+    "video": "/home-v3/redesign/studio-demo-hd.mp4"
+  }
 }

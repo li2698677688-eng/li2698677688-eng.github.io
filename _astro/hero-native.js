@@ -5,6 +5,7 @@ const TITLES = [
 ];
 
 const form = document.querySelector(".v3-prompt");
+const hero = form?.closest(".v3-hero");
 const textarea = document.querySelector("#v3-home-prompt");
 const fileInput = form?.querySelector(".v3-prompt__file-input");
 const addButton = form?.querySelector(".v3-prompt__add");
@@ -13,6 +14,12 @@ const typed = document.querySelector("[data-testid='hero-title-visible']");
 const measure = document.querySelector("[data-testid='hero-title-measure']");
 const objectUrls = new Set();
 let composing = false;
+
+function syncAttachmentLayout() {
+  const hasAttachments = Boolean(form?.querySelector(".v3-prompt__attachment"));
+  form?.classList.toggle("has-attachments", hasAttachments);
+  hero?.classList.toggle("has-prompt-attachments", hasAttachments);
+}
 
 function updateCount() {
   if (counter && textarea) counter.textContent = `${textarea.value.length}/280 characters`;
@@ -49,13 +56,13 @@ function addAttachments(files) {
       item.remove();
       if (!list.children.length) {
         list.remove();
-        form.classList.remove("has-attachments");
       }
+      syncAttachmentLayout();
     });
     item.append(preview, remove);
     list.append(item);
   }
-  form.classList.add("has-attachments");
+  syncAttachmentLayout();
   fileInput.value = "";
 }
 

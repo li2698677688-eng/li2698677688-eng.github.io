@@ -15,5 +15,4 @@ function importWhenNear(selector, modulePath) {
   observer.observe(section);
 }
 
-importWhenNear("#how", "./HowItWorks.astro_astro_type_script_index_0_lang.B4Q08uM8.js");
 importWhenNear("#faq", "./Faq.astro_astro_type_script_index_0_lang.7dHmyes1.js");
