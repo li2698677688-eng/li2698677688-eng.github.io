@@ -11,14 +11,13 @@ const pages = [
   "privacy-policy/index.html",
   "terms-of-service/index.html",
 ];
-const fontLinks = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&amp;display=swap">';
+const externalFontLinks = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&amp;display=swap">';
 
 for (const page of pages) {
   const url = new URL(page, root);
   let html = await readFile(url, "utf8");
-  html = html.replace(/\/_astro\/font-poppins\.css(?:\?v=\d+)?/g, "/_astro/font-poppins.css?v=3");
-  if (!html.includes('rel="preconnect" href="https://fonts.googleapis.com"')) {
-    html = html.replace('<link rel="stylesheet" href="/_astro/SiteFooter.5Tv4HviT.css">', `${fontLinks}<link rel="stylesheet" href="/_astro/SiteFooter.5Tv4HviT.css">`);
-  }
+  html = html
+    .replace(externalFontLinks, "")
+    .replace(/\/_astro\/font-poppins\.css(?:\?v=\d+)?/g, "/_astro/font-poppins.css?v=4");
   await writeFile(url, html);
 }

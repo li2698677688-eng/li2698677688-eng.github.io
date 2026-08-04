@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import test from "node:test";
 
 const root = new URL("../", import.meta.url);
@@ -18,16 +18,14 @@ async function read(path) {
 test("public pages load the global Roboto override and the homepage keeps its final scoped override", async () => {
   for (const page of pages) {
     const html = await read(page);
-    const fontStylesheet = '<link rel="stylesheet" href="/_astro/font-poppins.css?v=3">';
+    const fontStylesheet = '<link rel="stylesheet" href="/_astro/font-poppins.css?v=4">';
 
-    assert.match(html, /rel="preconnect" href="https:\/\/fonts\.googleapis\.com"/);
-    assert.match(html, /rel="preconnect" href="https:\/\/fonts\.gstatic\.com" crossorigin/);
-    assert.match(html, /fonts\.googleapis\.com\/css2\?family=Roboto:wght@100\.\.900&amp;display=swap/);
+    assert.doesNotMatch(html, /fonts\.googleapis\.com|fonts\.gstatic\.com/);
 
     if (page === "index.html") {
       assert.match(
         html,
-    /font-poppins\.css\?v=3">\s*<link rel="stylesheet" href="\/_astro\/home-figma-redesign\.css\?v=8">\s*<\/head>/,
+    /font-poppins\.css\?v=4">\s*<link rel="stylesheet" href="\/_astro\/home-figma-redesign\.css\?v=8">\s*<\/head>/,
       );
     } else {
       assert.match(
@@ -45,8 +43,10 @@ test("the global override changes only font family", async () => {
   ]);
 
   assert.match(css, /font-family:\s*Roboto,\s*sans-serif\s*!important/);
-  assert.doesNotMatch(css, /@import|fonts\.googleapis/);
-  assert.doesNotMatch(css, /(?:font-size|font-weight|color|line-height|letter-spacing)\s*:/);
+  assert.match(css, /@font-face\s*\{[^}]*font-family:\s*"Roboto"[^}]*font-weight:\s*100 900[^}]*font-display:\s*swap[^}]*url\("\/_astro\/roboto-latin-variable\.woff2"\) format\("woff2"\)/s);
+  assert.doesNotMatch(css, /@import|fonts\.googleapis|fonts\.gstatic/);
+  const globalOverride = css.replace(/@font-face\s*\{[^}]*\}/s, "");
+  assert.doesNotMatch(globalOverride, /(?:font-size|font-weight|color|line-height|letter-spacing)\s*:/);
   assert.match(homepageCss, /\.wanaka-home-v3,\s*\.wanaka-home-v3 \*\s*\{[^}]*font-family:\s*"Roboto",\s*sans-serif\s*!important/s);
   assert.doesNotMatch(homepageCss, /font-family:\s*"?(?:Poppins|Inter|Noto Sans SC|Noto Serif SC|Georgia)"?/i);
 
@@ -61,5 +61,13 @@ test("the global override changes only font family", async () => {
 test("the homepage optimizer preserves the global Roboto override", async () => {
   const optimizer = await read("scripts/optimize-homepage.mjs");
 
-  assert.match(optimizer, /\/_astro\/font-poppins\.css\?v=3/);
+  assert.match(optimizer, /\/_astro\/font-poppins\.css\?v=4/);
+});
+
+test("the Roboto variable font is self-hosted within its transfer budget", async () => {
+  const font = new URL("../_astro/roboto-latin-variable.woff2", import.meta.url);
+  const [contents, info] = await Promise.all([readFile(font), stat(font)]);
+
+  assert.equal(contents.subarray(0, 4).toString("ascii"), "wOF2");
+  assert.ok(info.size <= 40_000, "self-hosted Roboto exceeds 40 KB");
 });
